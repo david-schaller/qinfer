@@ -1,8 +1,8 @@
-CC=gcc
-CXX=g++
+CC=gcc-9
+CXX=g++-9
 RM=rm -f
-CPPFLAGS=-g -Wall
-LDFLAGS=-g
+CPPFLAGS=-g -Wall -std=c++17
+LDFLAGS=-g -lstdc++fs
 
 TARGET=qinfer
 

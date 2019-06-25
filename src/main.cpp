@@ -1,20 +1,38 @@
 #include <iostream>
+#include <filesystem>
 
 #include "qinfer.h"
+
+namespace fs = std::filesystem;
 
 auto
 main(int argc, char* argv[]) -> int
 {
-  constexpr auto multiplier = 42;
-  int i = 0;
+  // We need three input files (+ program name as first arg)
+  if (argc != 4) {
+    std::cerr << "3 input files required. "
+              << argc - 1
+              << " given. Abort!"
+              << std::endl;
+    return -1;
+  }
 
-  std::cout << "Enter a number" << std::endl;
-  std::cin >> i;
+  // Check if files exist
+  std::size_t fileCount = 3;
+  bool fileError = false;
+  for(std::size_t i = 1; i < fileCount + 1; ++i) {
+    fs::path filepath(argv[i]);
 
-  i *= multiplier;
+    if(!fs::exists(filepath) || !fs::is_regular_file(filepath)) {
+      std::cerr << "File "
+                << filepath
+                << " does not exist or is no file!"
+                << std::endl;
+      fileError = true;
+    }
+  }
 
-  std::cout << "Magic number: " << i << std::endl;
-  std::cout << test << std::endl;
+  if(fileError) return -2;
 
   return 0;
 }
