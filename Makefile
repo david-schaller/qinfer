@@ -11,7 +11,7 @@ INC=-I include
 OBJ=obj
 BIN=bin
 
-SRCS=src/main.cpp
+SRCS=$(shell find $(SRC) -name '*.cpp')
 OBJS=$(subst $(SRC)/,$(OBJ)/,$(subst .cpp,.o,$(SRCS)))
 
 all: $(TARGET)

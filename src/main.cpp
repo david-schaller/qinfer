@@ -1,6 +1,8 @@
 #include <iostream>
 #include <filesystem>
 
+#include <vector>
+
 #include "qinfer.h"
 
 namespace fs = std::filesystem;
@@ -33,6 +35,8 @@ main(int argc, char* argv[]) -> int
   }
 
   if(fileError) return -2;
+
+  std::vector<std::vector<double>> distanceMatrix = parseDistanceMatrix(argv[1]);
 
   return 0;
 }

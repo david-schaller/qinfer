@@ -1,3 +1,3 @@
 "bin/qinfer":
 	path: "bin/qinfer"
-	cwd: "bin"
+	args: ["test_data/matrix.phylip test_data/spec_genes.txt test_data/outgroups.txt"]
