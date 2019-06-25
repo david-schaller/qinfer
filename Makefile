@@ -7,7 +7,7 @@ LDFLAGS=-g
 TARGET=qinfer
 
 SRC=src
-INC=include
+INC=-I include
 OBJ=obj
 BIN=bin
 
@@ -22,7 +22,7 @@ qinfer: $(OBJS)
 
 $(OBJ)/%.o: $(SRC)/%.cpp
 	mkdir -p $(OBJ)
-	$(CXX) -I $(INC) -c $< -o $@
+	$(CXX) $(INC) -c $< -o $@
 
 clean:
 	rm -rf $(OBJ)
