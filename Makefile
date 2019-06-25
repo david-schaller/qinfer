@@ -22,7 +22,7 @@ qinfer: $(OBJS)
 
 $(OBJ)/%.o: $(SRC)/%.cpp
 	mkdir -p $(OBJ)
-	$(CXX) $(INC) -c $< -o $@
+	$(CXX) $(CPPFLAGS) $(INC) -c $< -o $@
 
 clean:
 	rm -rf $(OBJ)
