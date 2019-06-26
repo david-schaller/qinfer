@@ -1,11 +1,7 @@
 #include <fstream>
 #include <string>
 
-#include <iostream>
-
 #include "qinfer.h"
-
-#include <cassert>
 
 void
 DistanceMatrix::parseFromFile(const char* filepath)
@@ -13,8 +9,6 @@ DistanceMatrix::parseFromFile(const char* filepath)
   std::ifstream filestream(std::string(filepath), std::ios::binary);
 
   if(!filestream) {
-    std::cerr << "Failed to open " << filepath << std::endl;
-
     throw std::runtime_error("Failed to open file " + std::string(filepath));
   }
 
