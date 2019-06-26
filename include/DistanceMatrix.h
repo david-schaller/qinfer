@@ -1,8 +1,11 @@
-#ifndef QINFER_H
-#define QINFER_H
+#ifndef DISTANCEMATRIX_H
+#define DISTANCEMATRIX_H
 
 #include <vector>
 #include <string>
+#include <map>
+
+#include "Gene.h"
 
 class DistanceMatrix {
 public:
@@ -14,9 +17,10 @@ public:
 private:
   std::size_t m_dim;
   std::vector<std::vector<double>> m_distanceMatrix;
-  std::vector<std::string> m_genes;
+  std::vector<Gene> m_genes;
+  std::map<std::string, Gene*> m_geneAssignments;
 
   void parseRow(std::string row);
 };
 
-#endif /* QINFER_H */
+#endif /* DISTANCEMATRIX_H */

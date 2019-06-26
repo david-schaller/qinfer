@@ -1,6 +1,8 @@
 #include <fstream>
 #include <string>
 
+#include <iostream>
+
 #include "DistanceMatrix.h"
 
 void
@@ -26,6 +28,12 @@ DistanceMatrix::parseFromFile(const char* filepath)
 
     ++lineCounter;
   }
+
+  for(auto it = m_genes.begin(); it != m_genes.end(); ++it) {
+    m_geneAssignments.insert(
+      std::pair<std::string, Gene*>(it->getIdentifier(), &(*it))
+    );
+  }
 }
 
 void
@@ -44,7 +52,7 @@ DistanceMatrix::parseRow(std::string row)
 
     // Skip the first row which contains the identifier
     if(idx == 0) {
-      m_genes.push_back(token);
+      m_genes.push_back(Gene(token));
     } else {
       v[idx - 1] = std::stod(token);
     }
