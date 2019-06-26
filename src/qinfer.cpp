@@ -5,8 +5,10 @@
 
 #include "qinfer.h"
 
-std::vector<std::vector<double>>
-parseDistanceMatrix(char* filepath)
+#include <cassert>
+
+void
+DistanceMatrix::parseFromFile(const char* filepath)
 {
   std::ifstream filestream(std::string(filepath), std::ios::binary);
 
@@ -18,27 +20,24 @@ parseDistanceMatrix(char* filepath)
 
   auto v = std::vector<std::vector<double>>();
   std::size_t lineCounter = 0;
-  std::size_t totalLines = 0;
   std::string line;
   while(std::getline(filestream, line)) {
     // We are going to read the first line which contains the dimension
     if(lineCounter == 0) {
-      totalLines = std::stoi(line);
+      m_dim = std::stoi(line);
     }
     else {
-      v.push_back(parseDistanceMatrixRow(totalLines, line));
+      parseRow(line);
     }
 
     ++lineCounter;
   }
-
-  return v;
 }
 
-std::vector<double>
-parseDistanceMatrixRow(std::size_t totalLines, std::string row)
+void
+DistanceMatrix::parseRow(std::string row)
 {
-  auto v = std::vector<double>(totalLines, 0.0);
+  auto v = std::vector<double>(m_dim, 0.0);
 
   const std::string delimiter = "\t";
 
@@ -50,12 +49,32 @@ parseDistanceMatrixRow(std::size_t totalLines, std::string row)
     row.erase(0, pos + delimiter.length());
 
     // Skip the first row which contains the identifier
-    if(idx > 0) {
+    if(idx == 0) {
+      m_genes.push_back(token);
+    } else {
       v[idx - 1] = std::stod(token);
     }
 
     ++idx;
   }
 
-  return v;
+  m_distanceMatrix.push_back(v);
+}
+
+double& DistanceMatrix::operator()(std::size_t row, std::size_t col)
+{
+    if(col < 0 || col >= m_dim || row < 0 || row >= m_dim){
+       throw std::out_of_range("Index out of bounds! Please wait for help.");
+    }
+
+    return m_distanceMatrix[row][col];
+}
+
+const double& DistanceMatrix::operator()(std::size_t row, std::size_t col) const
+{
+    if(col < 0 || col >= m_dim || row < 0 || row >= m_dim){
+       throw std::out_of_range("Index out of bounds! Please wait for help.");
+    }
+
+    return m_distanceMatrix[row][col];
 }

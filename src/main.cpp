@@ -5,6 +5,8 @@
 
 #include "qinfer.h"
 
+#include <cassert>
+
 namespace fs = std::filesystem;
 
 auto
@@ -36,7 +38,8 @@ main(int argc, char* argv[]) -> int
 
   if(fileError) return -2;
 
-  std::vector<std::vector<double>> distanceMatrix = parseDistanceMatrix(argv[1]);
+  auto dm = DistanceMatrix();
+  dm.parseFromFile(argv[1]);
 
   return 0;
 }
