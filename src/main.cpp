@@ -1,6 +1,7 @@
 #include <iostream>
 #include <filesystem>
 
+#include "Scenario.h"
 #include "DistanceMatrix.h"
 
 namespace fs = std::filesystem;
@@ -34,7 +35,8 @@ main(int argc, char* argv[]) -> int
 
   if(fileError) return -2;
 
-  auto dm = DistanceMatrix();
+  auto s = Scenario();
+  auto dm = DistanceMatrix(&s);
   dm.parseFromFile(argv[1]);
 
   return 0;

@@ -5,22 +5,23 @@
 #include <string>
 #include <map>
 
+#include "Scenario.h"
 #include "Gene.h"
 
 class DistanceMatrix {
 public:
+  DistanceMatrix(Scenario* ptrS): m_ptrS(ptrS) { };
   void parseFromFile(const char* filepath);
 
   double& operator()(std::size_t row, std::size_t col);
   // for const distance matrices
   const double& operator()(std::size_t row, std::size_t col) const;
 private:
+  Scenario* m_ptrS;
   std::size_t m_dim;
   std::vector<std::vector<double>> m_distanceMatrix;
-  std::vector<Gene> m_genes;
-  std::map<std::string, Gene*> m_geneAssignments;
 
-  void parseRow(std::string row);
+  void parseRow(std::string row, std::vector<Gene>& g);
 };
 
 #endif /* DISTANCEMATRIX_H */

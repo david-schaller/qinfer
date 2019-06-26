@@ -15,6 +15,7 @@ DistanceMatrix::parseFromFile(const char* filepath)
   }
 
   auto v = std::vector<std::vector<double>>();
+  auto g = std::vector<Gene>();
   std::size_t lineCounter = 0;
   std::string line;
   while(std::getline(filestream, line)) {
@@ -23,21 +24,17 @@ DistanceMatrix::parseFromFile(const char* filepath)
       m_dim = std::stoi(line);
     }
     else {
-      parseRow(line);
+      parseRow(line, g);
     }
 
     ++lineCounter;
   }
 
-  for(auto it = m_genes.begin(); it != m_genes.end(); ++it) {
-    m_geneAssignments.insert(
-      std::pair<std::string, Gene*>(it->getIdentifier(), &(*it))
-    );
-  }
+  m_ptrS->addGenes(g);
 }
 
 void
-DistanceMatrix::parseRow(std::string row)
+DistanceMatrix::parseRow(std::string row, std::vector<Gene>& g)
 {
   auto v = std::vector<double>(m_dim, 0.0);
 
@@ -52,7 +49,7 @@ DistanceMatrix::parseRow(std::string row)
 
     // Skip the first row which contains the identifier
     if(idx == 0) {
-      m_genes.push_back(Gene(token));
+      g.push_back(Gene(token));
     } else {
       v[idx - 1] = std::stod(token);
     }
