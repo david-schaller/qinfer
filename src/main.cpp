@@ -18,10 +18,10 @@ main(int argc, char* argv[]) -> int
   }
 
   // Check if files exist
-  std::size_t fileCount = 3;
-  bool fileError = false;
+  const std::size_t fileCount = 3;
+  auto fileError = false;
   for(std::size_t i = 1; i < fileCount + 1; ++i) {
-    fs::path filepath(argv[i]);
+    const fs::path filepath(argv[i]);
 
     if(!fs::exists(filepath) || !fs::is_regular_file(filepath)) {
       std::cerr << "File "
