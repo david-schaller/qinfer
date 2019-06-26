@@ -1,11 +1,7 @@
 #include <iostream>
 #include <filesystem>
 
-#include <vector>
-
-#include "qinfer.h"
-
-#include <cassert>
+#include "DistanceMatrix.h"
 
 namespace fs = std::filesystem;
 

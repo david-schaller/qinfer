@@ -1,7 +1,7 @@
 #include <fstream>
 #include <string>
 
-#include "qinfer.h"
+#include "DistanceMatrix.h"
 
 void
 DistanceMatrix::parseFromFile(const char* filepath)
