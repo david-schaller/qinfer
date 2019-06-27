@@ -13,6 +13,8 @@ public:
   DistanceMatrix(Scenario* ptrS): m_ptrS(ptrS) { };
   void parseFromFile(const char* filepath);
 
+  std::size_t getDim() const { return m_dim; };
+
   double& operator()(std::size_t row, std::size_t col);
   // for const distance matrices
   const double& operator()(std::size_t row, std::size_t col) const;

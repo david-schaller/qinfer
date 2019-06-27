@@ -8,7 +8,7 @@ public:
   Gene(std::string identifier): m_identifier(identifier) { };
 
   inline std::string getIdentifier() { return m_identifier; };
-  inline std::string getSpecies() { return m_species; };
+  inline std::string getSpecies() const { return m_species; };
   inline void setSpecies(std::string species) { m_species = species; }
 private:
   std::string m_identifier;

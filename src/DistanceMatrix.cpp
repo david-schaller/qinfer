@@ -62,7 +62,8 @@ DistanceMatrix::parseRow(std::string row, std::vector<Gene>& g)
   m_distanceMatrix.push_back(v);
 }
 
-double& DistanceMatrix::operator()(std::size_t row, std::size_t col)
+double&
+DistanceMatrix::operator()(std::size_t row, std::size_t col)
 {
     if(col < 0 || col >= m_dim || row < 0 || row >= m_dim){
        throw std::out_of_range("Index out of bounds! Please wait for help.");
@@ -71,7 +72,8 @@ double& DistanceMatrix::operator()(std::size_t row, std::size_t col)
     return m_distanceMatrix[row][col];
 }
 
-const double& DistanceMatrix::operator()(std::size_t row, std::size_t col) const
+const double&
+DistanceMatrix::operator()(std::size_t row, std::size_t col) const
 {
     if(col < 0 || col >= m_dim || row < 0 || row >= m_dim){
        throw std::out_of_range("Index out of bounds! Please wait for help.");

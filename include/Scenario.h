@@ -11,6 +11,7 @@ class Scenario {
 public:
   void addGenes(std::vector<Gene>& g);
   void parseSpeciesGenes(const char* filepath);
+  inline std::string getGeneSpecies(int i) const { return m_genes[i].getSpecies(); };
 
 private:
   std::vector<Gene> m_genes;
