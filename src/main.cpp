@@ -3,6 +3,7 @@
 
 #include "Scenario.h"
 #include "DistanceMatrix.h"
+#include "BMcandidates.h"
 
 namespace fs = std::filesystem;
 
@@ -39,6 +40,8 @@ main(int argc, char* argv[]) -> int
   auto dm = DistanceMatrix(&s);
   dm.parseFromFile(argv[1]);
   s.parseSpeciesGenes(argv[2]);
+  auto bmCandidates = BMcandidates(&s);
+  bmCandidates.buildCandidateMatrix(dm, 0.5);
 
   return 0;
 }

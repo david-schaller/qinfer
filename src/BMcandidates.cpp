@@ -1,5 +1,7 @@
 #include <unordered_map>
 
+#include <iostream>
+
 #include "BMcandidates.h"
 
 void
@@ -29,11 +31,20 @@ BMcandidates::buildCandidateMatrix(const DistanceMatrix& dm, float epsilon){
       }
     }
 
-    for(j = 0; j < m_dim; ++j){
-      if(dm(i, j) <= (1 + epsilon) * speciesMap[m_ptrS->getGeneSpecies(j)]){
+    /*for(j = 0; j < m_dim; ++j){
+      auto species_j = m_ptrS->getGeneSpecies(j);
+      if( (species_i != species_j) &&
+          (dm(i, j) <= (1 + epsilon) * speciesMap[species_j])){
         m_candidateMatrix[i][j] = 1;
       }
+    }*/
+  }
+
+  for(std::size_t i = 0; i < m_dim; ++i){
+    for(std::size_t j = 0; j < m_dim; ++j){
+        std::cout << m_candidateMatrix[i][j] << "  ";
     }
+    std::cout << std::endl;
   }
 }
 
