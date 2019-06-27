@@ -1,5 +1,4 @@
 #include <fstream>
-
 #include <iostream>
 
 #include "Scenario.h"
@@ -38,7 +37,6 @@ Scenario::parseSpeciesGenes(const char* filepath){
   auto g = std::vector<Gene>();
   std::string line;
   while(std::getline(filestream, line)) {
-    // We are going to read the first line which contains the dimension
     parseSpeciesGenesLine(line);
   }
 }
@@ -63,11 +61,23 @@ Scenario::parseSpeciesGenesLine(std::string line){
       species = token;
       firstElement = false;
     } else {
-      g.push_back(m_geneAssignments[token]);
+      try {
+        g.push_back(m_geneAssignments.at(token));
+      } catch(const std::out_of_range&) {
+        std::cout << "WARNING: Species-to-genes-file contains additional entries: "
+                  << token
+                  << std::endl;
+      }
     }
   }
   // push back last line element
-  g.push_back(m_geneAssignments[line]);
+  try {
+    g.push_back(m_geneAssignments.at(line));
+  } catch(const std::out_of_range&) {
+    std::cout << "WARNING: Species-to-genes-file contains additional entries: "
+              << line
+              << std::endl;
+  }
 
   m_speciesGenes.insert(std::pair<std::string, std::vector<Gene*>>(species, g));
 }

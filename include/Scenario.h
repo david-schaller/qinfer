@@ -2,7 +2,7 @@
 #define SCENARIO_H
 
 #include <vector>
-#include <map>
+#include <unordered_map>
 #include <string>
 
 #include "Gene.h"
@@ -14,8 +14,8 @@ public:
 
 private:
   std::vector<Gene> m_genes;
-  std::map<std::string, Gene*> m_geneAssignments;
-  std::map<std::string, std::vector<Gene*>> m_speciesGenes;
+  std::unordered_map<std::string, Gene*> m_geneAssignments;
+  std::unordered_map<std::string, std::vector<Gene*>> m_speciesGenes;
 
   void rebuildMap();
   void parseSpeciesGenesLine(std::string line);
