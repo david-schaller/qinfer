@@ -63,6 +63,7 @@ Scenario::parseSpeciesGenesLine(std::string line){
     } else {
       try {
         g.push_back(m_geneAssignments.at(token));
+        m_geneAssignments.at(token)->setSpecies(species);
       } catch(const std::out_of_range&) {
         std::cout << "WARNING: Species-to-genes-file contains additional entries: "
                   << token
@@ -73,6 +74,7 @@ Scenario::parseSpeciesGenesLine(std::string line){
   // push back last line element
   try {
     g.push_back(m_geneAssignments.at(line));
+    m_geneAssignments.at(line)->setSpecies(species);
   } catch(const std::out_of_range&) {
     std::cout << "WARNING: Species-to-genes-file contains additional entries: "
               << line
