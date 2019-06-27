@@ -5,7 +5,9 @@ Scenario::addGenes(std::vector<Gene>& g)
 {
   m_genes.clear();
 
-  m_genes.insert(m_genes.end(), g.begin(), g.end());
+  m_genes.insert(m_genes.begin(), std::make_move_iterator(g.begin()),
+                 std::make_move_iterator(g.end()));
+
   rebuildMap();
 }
 
