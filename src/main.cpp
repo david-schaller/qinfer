@@ -38,6 +38,7 @@ main(int argc, char* argv[]) -> int
   auto s = Scenario();
   auto dm = DistanceMatrix(&s);
   dm.parseFromFile(argv[1]);
+  s.parseSpeciesGenes(argv[2]);
 
   return 0;
 }

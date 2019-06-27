@@ -47,7 +47,7 @@ DistanceMatrix::parseRow(std::string row, std::vector<Gene>& g)
     token = row.substr(0, pos);
     row.erase(0, pos + delimiter.length());
 
-    // Skip the first row which contains the identifier
+    // Skip the element row which contains the identifier
     if(idx == 0) {
       g.push_back(Gene(token));
     } else {
@@ -56,6 +56,8 @@ DistanceMatrix::parseRow(std::string row, std::vector<Gene>& g)
 
     ++idx;
   }
+  // parse the last element
+  v[idx - 1] = std::stod(row);
 
   m_distanceMatrix.push_back(v);
 }
