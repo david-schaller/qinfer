@@ -2,6 +2,7 @@
 #define DISTANCEMATRIX_H
 
 #include <vector>
+#include <deque>
 #include <string>
 #include <map>
 
@@ -23,7 +24,7 @@ private:
   std::size_t m_dim;
   std::vector<std::vector<double>> m_distanceMatrix;
 
-  void parseRow(std::string row, std::vector<Gene>& g);
+  void parseRow(std::string row, std::deque<Gene>& g);
 };
 
 #endif /* DISTANCEMATRIX_H */

@@ -4,7 +4,7 @@
 #include "Scenario.h"
 
 void
-Scenario::addGenes(std::vector<Gene>& g)
+Scenario::addGenes(std::deque<Gene>& g)
 {
   m_genes.clear();
 
@@ -34,7 +34,7 @@ Scenario::parseSpeciesGenes(const char* filepath){
   }
 
   auto v = std::vector<std::vector<double>>();
-  auto g = std::vector<Gene>();
+  auto g = std::deque<Gene>();
   std::string line;
   while(std::getline(filestream, line)) {
     parseSpeciesGenesLine(line);
