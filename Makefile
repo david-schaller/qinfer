@@ -31,6 +31,7 @@ tests: $(BIN)/unittest
 	./$(BIN)/unittest
 
 $(BIN)/$(TARGET): $(OBJS)
+	mkdir -p $(BIN)
 	$(CXX) $(LDFLAGS) -o $@ $(OBJS)
 
 $(BIN)/unittest : $(filter-out $(OBJ)/main.o,$(OBJS)) $(UT_OBJS) $(BIN)/gtest_main.a

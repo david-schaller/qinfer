@@ -14,6 +14,11 @@ public:
   inline std::size_t getIndex() const { return m_idx; };
 
   inline void setSpecies(std::string species) { m_species = species; }
+
+  inline bool operator==(const Gene &otherGene) const
+    {
+        return (m_identifier == otherGene.m_identifier);
+    }
 private:
   std::string m_identifier;
   std::string m_species;
