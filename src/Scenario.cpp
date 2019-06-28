@@ -155,10 +155,10 @@ Scenario::buildOutgroupLists(){
     }
   }
 
-  for(auto it = m_outgroups.begin(); it != m_outgroups.end(); ++it){
-    for(auto it2 = (*it).begin(); it2 != (*it).end(); ++it2){
-      std::cout << (*it2)->getIdentifier() << "  ";
-    }
-    std::cout << std::endl;
-  }
+  // for(auto it = m_outgroups.begin(); it != m_outgroups.end(); ++it){
+  //   for(auto it2 = (*it).begin(); it2 != (*it).end(); ++it2){
+  //     std::cout << (*it2)->getIdentifier() << "  ";
+  //   }
+  //   std::cout << std::endl;
+  // }
 }
