@@ -3,7 +3,7 @@
 
 #include "Scenario.h"
 #include "DistanceMatrix.h"
-#include "BMcandidates.h"
+#include "BMCandidates.h"
 
 namespace fs = std::filesystem;
 

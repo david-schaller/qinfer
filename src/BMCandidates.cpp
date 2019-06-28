@@ -1,8 +1,6 @@
 #include <unordered_map>
 
-#include <iostream>
-
-#include "BMcandidates.h"
+#include "BMCandidates.h"
 
 void
 BMcandidates::buildCandidateMatrix(const DistanceMatrix& dm, float epsilon){
