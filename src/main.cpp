@@ -42,6 +42,7 @@ main(int argc, char* argv[]) -> int
   s.parseSpeciesGenes(argv[2]);
   auto bmCandidates = BMcandidates(&s);
   bmCandidates.buildCandidateMatrix(dm, 0.5);
+  s.parseSTreeSubtrees(argv[3]);
 
   return 0;
 }
