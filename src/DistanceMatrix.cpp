@@ -65,7 +65,7 @@ DistanceMatrix::parseRow(std::string row, std::deque<Gene>& g)
 double&
 DistanceMatrix::operator()(std::size_t row, std::size_t col)
 {
-    if(col < 0 || col >= m_dim || row < 0 || row >= m_dim){
+    if(col >= m_dim || row >= m_dim){
        throw std::out_of_range("Index out of bounds! Please wait for help.");
     }
 
@@ -75,7 +75,7 @@ DistanceMatrix::operator()(std::size_t row, std::size_t col)
 const double&
 DistanceMatrix::operator()(std::size_t row, std::size_t col) const
 {
-    if(col < 0 || col >= m_dim || row < 0 || row >= m_dim){
+    if(col >= m_dim || row >= m_dim){
        throw std::out_of_range("Index out of bounds! Please wait for help.");
     }
 
