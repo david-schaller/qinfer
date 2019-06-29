@@ -7,6 +7,9 @@
 #include <set>
 #include <stack>
 
+// function std::min()
+#include <algorithm>
+
 template<typename T>
 class DiGraph {
 public:
@@ -52,18 +55,77 @@ DiGraph<T>::addEdge(T u, T v){
 template<typename T>
 std::vector<std::set<T>>
 DiGraph<T>::stronglyConnectedComponent(){
+  // Uses Tarjan's algorithm with Nuutila's modifications.
+  // Nonrecursive version of algorithm.
+  // (reimplemented from Python package "NetworkX")
 
   auto sccs = std::vector<std::set<T>>();
 
-  auto nbrs = std::map<T, std::vector<T>*>();
+  //auto nbrs = std::map<T, std::vector<T>*>();
   auto preorder = std::map<T, int>();
   auto lowLink = std::map<T, int>();
   auto sccFound = std::set<T>();
+  auto sccStack = std::stack<T>();
   auto scc = std::stack<T>();
+  int i = 0;
 
   for(auto source = m_adjList.begin(); source != m_adjList.end(); ++source){
-    if(sccFound.find(source->first) != sccFound.end()){
+    if(sccFound.find(source->first) == sccFound.end()){
+      auto stack = std::stack<T>();
+      stack.push(source->first);
 
+      while(!stack.empty()){
+        T v = stack.top();
+
+        if(preorder.find(v) == preorder.end()){
+          ++i;
+          preorder[v] = i;
+        }
+
+        int done = 1;
+        const std::vector<T>& vNbrs = getNeighbors(v);
+        for(auto w = vNbrs.begin(); w != vNbrs.end(); ++w){
+          if(preorder.find(*w) == preorder.end()){
+            stack.push(*w);
+            done = 0;
+            break;
+          }
+        }
+
+        if(done == 1){
+          lowLink[v] = preorder[v];
+
+          for(auto w = vNbrs.begin(); w != vNbrs.end(); ++w){
+            if(sccFound.find(*w) == sccFound.end()){
+              if(preorder[*w] > preorder[v]){
+                lowLink[v] = std::min(lowLink[v], lowLink[*w]);
+              } else {
+                lowLink[v] = std::min(lowLink[v], preorder[*w]);
+              }
+            }
+          }
+
+          stack.pop();
+
+          if(lowLink[v] == preorder[v]){
+            sccFound.insert(v);
+            sccs.push_back(std::set<T>());
+            auto& scc = sccs.back();
+            scc.insert(v);
+
+            while((!sccStack.empty()) &&
+                  (preorder[sccStack.top()] > preorder[v])){
+              T k = sccStack.top();
+              sccStack.pop();
+              sccFound.insert(k);
+              scc.insert(k);
+            }
+
+          } else {
+            sccStack.push(v);
+          }
+        }
+      }
     }
   }
 

@@ -2,12 +2,14 @@
 
 #include <vector>
 
+#include <iostream>
+
 #include "DiGraph.t"
 
 namespace {
 
 TEST(DiGraphTest, Neighbors) {
-  auto dg = ::DiGraph<int*>();
+  auto dg = DiGraph<int*>();
 
   int i1 = 1;
   int i2 = 2;
@@ -29,12 +31,13 @@ TEST(DiGraphTest, Neighbors) {
 }
 
 TEST(DiGraphTest, SCCS) {
-  auto dg = ::DiGraph<int*>();
+  auto dg = DiGraph<int*>();
 
   int i1 = 1;
   int i2 = 2;
   int i3 = 3;
   int i4 = 4;
+  int i5 = 5;
 
   dg.addEdge(&i1, &i2);
   dg.addEdge(&i2, &i1);
@@ -43,11 +46,19 @@ TEST(DiGraphTest, SCCS) {
   dg.addEdge(&i2, &i3);
 
   dg.addNode(&i4);
+  dg.addEdge(&i4, &i5);
+  dg.addEdge(&i5, &i4);
 
   auto neighbors = dg.getNeighbors(&i2);
   std::vector<int*> neighbors_expected{ &i1, &i3 };
 
   auto sccs = dg.stronglyConnectedComponent();
+  for(auto sccIt = sccs.begin(); sccIt != sccs.end(); ++sccIt){
+    for(auto itemIt = (*sccIt).begin(); itemIt != (*sccIt).end(); ++itemIt){
+      std::cout << **itemIt << "  ";
+    }
+    std::cout << std::endl;
+  }
 
   EXPECT_EQ(neighbors, neighbors_expected);
 }
