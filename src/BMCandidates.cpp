@@ -3,7 +3,7 @@
 #include "BMCandidates.h"
 
 void
-BMcandidates::buildCandidateMatrix(const DistanceMatrix& dm, float epsilon){
+BMCandidates::buildCandidateMatrix(const DistanceMatrix& dm, float epsilon){
   m_dim = dm.getDim();
   m_candidateMatrix = std::vector<std::vector<int>>(
                         m_dim, std::vector<int>(m_dim, 0)
@@ -48,7 +48,7 @@ BMcandidates::buildCandidateMatrix(const DistanceMatrix& dm, float epsilon){
 }
 
 int&
-BMcandidates::operator()(std::size_t row, std::size_t col)
+BMCandidates::operator()(std::size_t row, std::size_t col)
 {
     if(col >= m_dim || row >= m_dim){
        throw std::out_of_range("Index out of bounds! Please wait for help.");
@@ -58,7 +58,7 @@ BMcandidates::operator()(std::size_t row, std::size_t col)
 }
 
 const int&
-BMcandidates::operator()(std::size_t row, std::size_t col) const
+BMCandidates::operator()(std::size_t row, std::size_t col) const
 {
     if(col >= m_dim || row >= m_dim){
        throw std::out_of_range("Index out of bounds! Please wait for help.");

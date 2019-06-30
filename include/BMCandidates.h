@@ -6,9 +6,9 @@
 #include "Scenario.h"
 #include "DistanceMatrix.h"
 
-class BMcandidates {
+class BMCandidates {
 public:
-  BMcandidates(Scenario* ptrS): m_ptrS(ptrS) { };
+  BMCandidates(Scenario* ptrS): m_ptrS(ptrS) { };
 
   void buildCandidateMatrix(const DistanceMatrix& dm, float epsilon);
 

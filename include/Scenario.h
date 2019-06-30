@@ -13,7 +13,13 @@ public:
   void addGenes(std::deque<Gene>& g);
 
   void parseSpeciesGenes(const char* filepath);
-  inline std::string getGeneSpecies(int i) const { return m_genes[i].getSpecies(); };
+  inline std::string getGeneSpecies(int i) const {
+    return m_genes[i].getSpecies();
+  };
+  inline const std::deque<Gene>& getGenes() const { return m_genes; };
+  inline const std::vector<Gene*>& getSpeciesGenes(std::string species) const {
+    return m_speciesGenes.at(species);
+  };
 
   void parseSTreeSubtrees(const char* filepath);
 

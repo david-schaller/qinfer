@@ -4,6 +4,7 @@
 #include "Scenario.h"
 #include "DistanceMatrix.h"
 #include "BMCandidates.h"
+#include "BMGBuilder.h"
 
 namespace fs = std::filesystem;
 
@@ -40,9 +41,11 @@ main(int argc, char* argv[]) -> int
   auto dm = DistanceMatrix(&s);
   dm.parseFromFile(argv[1]);
   s.parseSpeciesGenes(argv[2]);
-  auto bmCandidates = BMcandidates(&s);
+  auto bmCandidates = BMCandidates(&s);
   bmCandidates.buildCandidateMatrix(dm, 0.5);
   s.parseSTreeSubtrees(argv[3]);
+
+  auto bmgB = BMGBuilder(&s, &dm, &bmCandidates);
 
   return 0;
 }

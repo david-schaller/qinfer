@@ -1,5 +1,5 @@
-#ifndef DIGRAPH_H
-#define DIGRAPH_H
+#ifndef DIGRAPH_T
+#define DIGRAPH_T
 
 #include <vector>
 #include <map>
@@ -16,10 +16,11 @@ public:
   void addNode(T v);
   void addEdge(T u, T v);
 
-  std::vector<std::set<T>> stronglyConnectedComponent();
+  std::vector<std::set<T>> stronglyConnectedComponents() const;
+  std::vector<T> getSccWithoutOutedges() const;
 
-  inline const std::vector<T>& getNeighbors(T u) {
-    return m_adjList[u];
+  inline const std::vector<T>& getNeighbors(T u) const {
+    return m_adjList.at(u);
   };
 
 private:
@@ -54,7 +55,7 @@ DiGraph<T>::addEdge(T u, T v){
 
 template<typename T>
 std::vector<std::set<T>>
-DiGraph<T>::stronglyConnectedComponent(){
+DiGraph<T>::stronglyConnectedComponents() const {
   // Uses Tarjan's algorithm with Nuutila's modifications.
   // Nonrecursive version of algorithm.
   // (reimplemented from Python package "NetworkX")
@@ -83,10 +84,9 @@ DiGraph<T>::stronglyConnectedComponent(){
         }
 
         int done = 1;
-        const std::vector<T>& vNbrs = getNeighbors(v);
-        for(auto w = vNbrs.begin(); w != vNbrs.end(); ++w){
-          if(preorder.find(*w) == preorder.end()){
-            stack.push(*w);
+        for(auto w : m_adjList.at(v)){
+          if(preorder.find(w) == preorder.end()){
+            stack.push(w);
             done = 0;
             break;
           }
@@ -95,12 +95,12 @@ DiGraph<T>::stronglyConnectedComponent(){
         if(done == 1){
           lowLink[v] = preorder[v];
 
-          for(auto w = vNbrs.begin(); w != vNbrs.end(); ++w){
-            if(sccFound.find(*w) == sccFound.end()){
-              if(preorder[*w] > preorder[v]){
-                lowLink[v] = std::min(lowLink[v], lowLink[*w]);
+          for(auto w : m_adjList.at(v)){
+            if(sccFound.find(w) == sccFound.end()){
+              if(preorder[w] > preorder[v]){
+                lowLink[v] = std::min(lowLink[v], lowLink[w]);
               } else {
-                lowLink[v] = std::min(lowLink[v], preorder[*w]);
+                lowLink[v] = std::min(lowLink[v], preorder[w]);
               }
             }
           }
@@ -132,4 +132,33 @@ DiGraph<T>::stronglyConnectedComponent(){
   return sccs;
 }
 
-#endif /* DIGRAPH_H */
+template<typename T>
+std::vector<T>
+DiGraph<T>::getSccWithoutOutedges() const {
+
+  auto sccs = stronglyConnectedComponents();
+  auto result = std::vector<T>();
+
+  for(auto scc : sccs){
+    bool noOutedges = true;
+
+    for(auto v : scc){
+      for(auto w : m_adjList.at(v)){
+        if(scc.find(w) == scc.end()){
+          noOutedges = false;
+        }
+      }
+    }
+
+    if(noOutedges){
+      for(auto v : scc){
+        result.push_back(v);
+      }
+      break;
+    }
+  }
+
+  return result;
+}
+
+#endif /* DIGRAPH_T */
