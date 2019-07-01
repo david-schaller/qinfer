@@ -16,9 +16,9 @@ public:
 
   std::size_t getDim() const { return m_dim; };
 
-  double& operator()(std::size_t row, std::size_t col);
+  double& at(std::size_t row, std::size_t col);
   // for const distance matrices
-  const double& operator()(std::size_t row, std::size_t col) const;
+  const double& at(std::size_t row, std::size_t col) const;
 private:
   Scenario* m_ptrS;
   std::size_t m_dim;

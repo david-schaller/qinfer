@@ -1,9 +1,11 @@
 #include <algorithm>
+#include <iterator>
 #include <iostream>
 #include <random>
-#include <vector>
+#include <cmath>
 
 #include "BMGBuilder.h"
+#include "DiGraph.t"
 
 std::vector<Gene*>
 BMGBuilder::chooseOutgroups(const std::vector<Gene*>& outgroupCandidates){
@@ -21,6 +23,118 @@ BMGBuilder::chooseOutgroups(const std::vector<Gene*>& outgroupCandidates){
   return outgroups;
 }
 
+std::vector<Gene*>
+BMGBuilder::findBestMatches(const Gene* x,
+                            const std::vector<Gene*>& genesY,
+                            const std::vector<Gene*>& outgroupsZ){
+  auto gamma = DiGraph<Gene*>();
+
+  for(std::size_t i = 0; i < genesY.size(); ++i){
+    Gene* y1 = genesY[i];
+    for(std::size_t j = i+1; j < genesY.size(); ++j){
+      Gene* y2 = genesY[j];
+
+      std::vector<double> votes = {0.0, 0.0, 0.0, 0.0};
+
+      for(const Gene* z : outgroupsZ){
+        if(m_weightedMode){
+          auto voteAndWeight = supportedQuartetWeighted(x, y1, y2, z);
+          votes[voteAndWeight.first] += voteAndWeight.second;
+        } else {
+          votes[supportedQuartetMajority(x, y1, y2, z)] += 1.0;
+        }
+      }
+
+      int quartet = std::distance(votes.begin(),
+                                  std::max_element(votes.begin(), votes.end()));
+      switch(quartet){
+        case 0:
+          // 0: xy1 | y2z
+          gamma.addEdge(y2, y1);
+          break;
+        case 1:
+          // 1: xy2 | y1z
+          gamma.addEdge(y1, y2);
+          break;
+        default:
+          // 2: xz | y1y2   or   3: star
+          gamma.addEdge(y2, y1);
+          gamma.addEdge(y1, y2);
+      }
+    }
+  }
+
+  return gamma.getSccWithoutOutedges();
+}
+
+std::size_t
+BMGBuilder::supportedQuartetMajority(const Gene* x, const Gene* y1,
+                                     const Gene* y2, const Gene* z){
+  std::size_t xIdx = x->getIndex();
+  std::size_t y1Idx = y1->getIndex();
+  std::size_t y2Idx = y2->getIndex();
+  std::size_t zIdx = z->getIndex();
+  std::size_t quartet;
+
+  double xy1_y2z = m_ptrDm->at(xIdx, y1Idx) + m_ptrDm->at(y2Idx, zIdx);
+  double xy2_y1z = m_ptrDm->at(xIdx, y2Idx) + m_ptrDm->at(y1Idx, zIdx);
+  double xz_y1y2 = m_ptrDm->at(xIdx, zIdx) + m_ptrDm->at(y1Idx, y2Idx);
+
+  // 0: xy1 | y2z
+  if(xy1_y2z < xy2_y1z && xy1_y2z < xz_y1y2){
+    quartet = 0;
+  // 1: xy2 | y1z
+  } else if(xy2_y1z < xy1_y2z && xy2_y1z < xz_y1y2){
+    quartet = 1;
+  // 2: xz | y1y2
+  } else if(xz_y1y2 < xy1_y2z && xz_y1y2 < xy2_y1z){
+    quartet = 2;
+  // 3: star topology
+  } else {
+    quartet = 3;
+  }
+
+  return quartet;
+}
+
+std::pair<std::size_t,double>
+BMGBuilder::supportedQuartetWeighted(const Gene* x, const Gene* y1,
+                                     const Gene* y2, const Gene* z){
+  std::size_t xIdx = x->getIndex();
+  std::size_t y1Idx = y1->getIndex();
+  std::size_t y2Idx = y2->getIndex();
+  std::size_t zIdx = z->getIndex();
+  std::size_t quartet;
+  double weight = 0.0;
+
+  double xy1_y2z = m_ptrDm->at(xIdx, y1Idx) + m_ptrDm->at(y2Idx, zIdx);
+  double xy2_y1z = m_ptrDm->at(xIdx, y2Idx) + m_ptrDm->at(y1Idx, zIdx);
+  double xz_y1y2 = m_ptrDm->at(xIdx, zIdx) + m_ptrDm->at(y1Idx, y2Idx);
+
+  // 0: xy1 | y2z
+  if(xy1_y2z < xy2_y1z && xy1_y2z < xz_y1y2){
+    quartet = 0;
+  // 1: xy2 | y1z
+  } else if(xy2_y1z < xy1_y2z && xy2_y1z < xz_y1y2){
+    quartet = 1;
+  // 2: xz | y1y2
+  } else if(xz_y1y2 < xy1_y2z && xz_y1y2 < xy2_y1z){
+    quartet = 2;
+  // 3: star topology
+  } else {
+    quartet = 3;
+  }
+
+  std::vector<double> sums = {xy1_y2z, xy2_y1z, xz_y1y2};
+  std::sort(sums.begin(), sums.end());
+
+  if(sums[2] > 0){
+    weight = (1 - sums[0]/sums[2]) * std::exp(sums[1]-sums[2]);
+  }
+
+  return std::make_pair(quartet, weight);
+}
+
 void
 BMGBuilder::buildBMG(){
 
@@ -33,7 +147,7 @@ BMGBuilder::buildBMG(){
   for(Gene& x : m_ptrS->getGenes()){
     const std::vector<Gene*>& outgroupCandidates = m_ptrS->getOutgroups(&x);
     std::vector<Gene*> outgroupsZ = chooseOutgroups(outgroupCandidates);
-
+    std::cout << x.getIdentifier() << std::endl;
     for(const std::string& speciesY : m_ptrS->getSpeciesSubtree(x.getSubtree())){
 
       // skip the own species
@@ -60,14 +174,30 @@ BMGBuilder::buildBMG(){
         } else {
           genesY = std::vector<Gene*>();
           for(Gene* genePtr : allGenesY){
-            if(m_ptrBmc->operator()(x.getIndex(), genePtr->getIndex())){
+            if(m_ptrBmc->at(x.getIndex(), genePtr->getIndex())){
               genesY.push_back(genePtr);
             }
           }
         }
 
         // find best matches in gene set Y
+        for(Gene* bm : findBestMatches(&x, genesY, outgroupsZ)){
+          m_bmg.addEdge(&x, bm);
+        }
+      }
+    }
+  }
+}
 
+void
+BMGBuilder::printBMG(){
+  for(const auto& vNbrsPair : m_bmg.getAdjacency()){
+    if(vNbrsPair.second.size() > 0){
+      for(const Gene* nbr : vNbrsPair.second){
+        std::cout << vNbrsPair.first->getIdentifier()
+                  << " "
+                  << nbr->getIdentifier()
+                  << std::endl;
       }
     }
   }

@@ -19,11 +19,11 @@ BMCandidates::buildCandidateMatrix(const DistanceMatrix& dm, float epsilon){
       if(species_i != species_j){
         if(speciesMap.find(species_j) == speciesMap.end()){
           // initialize minimum if key did not exist so far
-          speciesMap[species_j] = dm(i, j);
+          speciesMap[species_j] = dm.at(i, j);
         } else {
           // update the minimum
-          if(dm(i, j) < speciesMap[species_j]){
-            speciesMap[species_j] = dm(i, j);
+          if(dm.at(i, j) < speciesMap[species_j]){
+            speciesMap[species_j] = dm.at(i, j);
           }
         }
       }
@@ -32,7 +32,7 @@ BMCandidates::buildCandidateMatrix(const DistanceMatrix& dm, float epsilon){
     for(j = 0; j < m_dim; ++j){
       auto species_j = m_ptrS->getGeneSpecies(j);
       if( (species_i != species_j) &&
-          (dm(i, j) <= (1 + epsilon) * speciesMap[species_j])){
+          (dm.at(i, j) <= (1 + epsilon) * speciesMap[species_j])){
         m_candidateMatrix[i][j] = 1;
       }
     }
@@ -48,7 +48,7 @@ BMCandidates::buildCandidateMatrix(const DistanceMatrix& dm, float epsilon){
 }
 
 int&
-BMCandidates::operator()(std::size_t row, std::size_t col)
+BMCandidates::at(std::size_t row, std::size_t col)
 {
     if(col >= m_dim || row >= m_dim){
        throw std::out_of_range("Index out of bounds! Please wait for help.");
@@ -58,7 +58,7 @@ BMCandidates::operator()(std::size_t row, std::size_t col)
 }
 
 const int&
-BMCandidates::operator()(std::size_t row, std::size_t col) const
+BMCandidates::at(std::size_t row, std::size_t col) const
 {
     if(col >= m_dim || row >= m_dim){
        throw std::out_of_range("Index out of bounds! Please wait for help.");

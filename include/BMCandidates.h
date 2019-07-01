@@ -12,9 +12,9 @@ public:
 
   void buildCandidateMatrix(const DistanceMatrix& dm, float epsilon);
 
-  int& operator()(std::size_t row, std::size_t col);
+  int& at(std::size_t row, std::size_t col);
   // for const best match distance matrices
-  const int& operator()(std::size_t row, std::size_t col) const;
+  const int& at(std::size_t row, std::size_t col) const;
 private:
   Scenario* m_ptrS;
   std::size_t m_dim;

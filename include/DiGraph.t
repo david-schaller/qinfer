@@ -18,6 +18,9 @@ public:
 
   std::vector<std::set<T>> stronglyConnectedComponents() const;
   std::vector<T> getSccWithoutOutedges() const;
+  const std::unordered_map<T, std::vector<T>>& getAdjacency() const {
+    return m_adjList;
+  };
 
   inline const std::vector<T>& getNeighbors(T u) const {
     return m_adjList.at(u);
