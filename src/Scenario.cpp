@@ -13,6 +13,16 @@ Scenario::addGenes(std::deque<Gene>& g)
   rebuildMap();
 }
 
+const std::vector<Gene*>&
+Scenario::getOutgroups(Gene* genePtr) const {
+  return m_outgroups[genePtr->getSubtree()];
+}
+
+const std::vector<std::string>&
+Scenario::getSpeciesSubtree(std::size_t subtreeIdx) const {
+  return m_STreeSubtrees[subtreeIdx];
+}
+
 void
 Scenario::rebuildMap()
 {
@@ -105,7 +115,7 @@ Scenario::parseSTreeSubtrees(const char* filepath){
   // }
 
   // build the corresponding lists of outgroup genes
-  buildOutgroupLists();
+  buildOutgroupInfo();
 }
 
 void
@@ -141,7 +151,7 @@ Scenario::parseSTreeSubtreeLine(std::string line){
 }
 
 void
-Scenario::buildOutgroupLists(){
+Scenario::buildOutgroupInfo(){
   for(std::size_t i = 0; i < m_STreeSubtrees.size(); ++i){
     m_outgroups.push_back(std::vector<Gene*>());
     for(std::size_t j = 0; j < m_STreeSubtrees.size(); ++j){
@@ -151,6 +161,12 @@ Scenario::buildOutgroupLists(){
                                     m_speciesGenes[species].begin(),
                                     m_speciesGenes[species].end());
         }
+      }
+    }
+
+    for(const auto& species : m_STreeSubtrees[i]){
+      for(auto genePtr : m_speciesGenes[species]){
+        genePtr->setSubtree(i);
       }
     }
   }

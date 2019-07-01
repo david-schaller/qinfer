@@ -13,14 +13,16 @@ public:
   void addGenes(std::deque<Gene>& g);
 
   void parseSpeciesGenes(const char* filepath);
-  inline std::string getGeneSpecies(int i) const {
+  inline const std::string& getGeneSpecies(int i) const {
     return m_genes[i].getSpecies();
   };
-  inline const std::deque<Gene>& getGenes() const { return m_genes; };
+  inline std::deque<Gene>& getGenes() { return m_genes; };
   inline const std::vector<Gene*>& getSpeciesGenes(std::string species) const {
     return m_speciesGenes.at(species);
   };
 
+  const std::vector<Gene*>& getOutgroups(Gene* genePtr) const;
+  const std::vector<std::string>& getSpeciesSubtree(std::size_t subtreeIdx) const;
   void parseSTreeSubtrees(const char* filepath);
 
 private:
@@ -36,7 +38,7 @@ private:
   void rebuildMap();
   void parseSpeciesGenesLine(std::string line);
   void parseSTreeSubtreeLine(std::string line);
-  void buildOutgroupLists();
+  void buildOutgroupInfo();
 };
 
 #endif /* SCENARIO_H */

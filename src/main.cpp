@@ -45,7 +45,9 @@ main(int argc, char* argv[]) -> int
   bmCandidates.buildCandidateMatrix(dm, 0.5);
   s.parseSTreeSubtrees(argv[3]);
 
-  auto bmgB = BMGBuilder(&s, &dm, &bmCandidates);
+  std::size_t outgroupLimit = 10;
+  auto bmgB = BMGBuilder(&s, &dm, &bmCandidates, outgroupLimit, true);
+  bmgB.buildBMG();
 
   return 0;
 }
