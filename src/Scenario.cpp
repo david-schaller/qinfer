@@ -36,6 +36,55 @@ Scenario::rebuildMap()
 }
 
 void
+Scenario::parseDistanceMatrix(const char* filepath){
+  std::ifstream filestream(std::string(filepath), std::ios::binary);
+
+  if(!filestream) {
+    throw std::runtime_error("Failed to open file " + std::string(filepath));
+  }
+
+  std::size_t lineCounter = 0;
+  std::string line;
+  while(std::getline(filestream, line)) {
+    // read the first line which contains the dimension
+    if(lineCounter == 0) {
+      m_distanceMatrix.initMatrix(std::stoi(line), 0.0);
+    }
+    else {
+      parseDistanceMatrixRow(line, lineCounter-1);
+    }
+
+    ++lineCounter;
+  }
+  rebuildMap();
+}
+
+void
+Scenario::parseDistanceMatrixRow(std::string row, std::size_t rowIdx){
+
+  const std::string delimiter = "\t";
+
+  std::size_t columnIdx = 0;
+  size_t pos = 0;
+  std::string token;
+  while ((pos = row.find(delimiter)) != std::string::npos) {
+    token = row.substr(0, pos);
+    row.erase(0, pos + delimiter.length());
+
+    // the first row element contains the identifier
+    if(columnIdx == 0) {
+      m_genes.push_back(Gene(token, m_genes.size()));
+    } else {
+      m_distanceMatrix.at(rowIdx, columnIdx - 1) = std::stod(token);
+    }
+
+    ++columnIdx;
+  }
+  // parse the last element
+  m_distanceMatrix.at(rowIdx, columnIdx - 1) = std::stod(token);
+}
+
+void
 Scenario::parseSpeciesGenes(const char* filepath){
   std::ifstream filestream(std::string(filepath), std::ios::binary);
 

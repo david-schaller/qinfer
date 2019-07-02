@@ -6,35 +6,35 @@
 
 #include "Gene.h"
 #include "Scenario.h"
-#include "DistanceMatrix.h"
-#include "BMCandidates.h"
-#include "DiGraph.t"
+#include "DiGraph.h"
+#include "Matrix.h"
 
 class BMGBuilder {
 public:
-  BMGBuilder(Scenario* ptrS, DistanceMatrix* ptrDm, BMCandidates* ptrBmc,
-             std::size_t outgroupLimit, bool restrictY,
+  BMGBuilder(Scenario* ptrS,
+             std::size_t outgroupLimit,
+             bool restrictY, double epsilon=0.5,
              bool weightedMode=false)
-    : m_ptrS(ptrS)
-    , m_ptrDm(ptrDm)
-    , m_ptrBmc(ptrBmc)
-    , m_outgroupLimit(outgroupLimit)
-    , m_restrictY(restrictY)
-    , m_weightedMode(weightedMode) { };
+   : m_ptrS(ptrS)
+   , m_outgroupLimit(outgroupLimit)
+   , m_restrictY(restrictY)
+   , m_epsilon(epsilon)
+   , m_weightedMode(weightedMode) { };
 
   void buildBMG();
   void printBMG();
 
 private:
   Scenario* m_ptrS;
-  DistanceMatrix* m_ptrDm;
-  BMCandidates* m_ptrBmc;
   std::size_t m_outgroupLimit;
   bool m_restrictY;
+  float m_epsilon;
   bool m_weightedMode;
 
+  Matrix<int> m_bmCandidates;
   DiGraph<Gene*> m_bmg;
 
+  void buildCandidateMatrix();
   std::vector<Gene*> chooseOutgroups(const std::vector<Gene*>& outgroupCandidates);
   std::vector<Gene*> findBestMatches(const Gene* x,
                                      const std::vector<Gene*>& genesY,

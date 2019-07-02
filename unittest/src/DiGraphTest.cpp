@@ -4,7 +4,7 @@
 
 #include <iostream>
 
-#include "DiGraph.t"
+#include "DiGraph.h"
 
 namespace {
 

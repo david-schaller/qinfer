@@ -5,7 +5,50 @@
 #include <cmath>
 
 #include "BMGBuilder.h"
-#include "DiGraph.t"
+#include "DiGraph.h"
+
+void
+BMGBuilder::buildCandidateMatrix(){
+  std::size_t dim {m_ptrS->getGenes().size()};
+  m_bmCandidates.initMatrix(dim, 0);
+
+  for(std::size_t i = 0; i < dim; ++i){
+    auto speciesMap = std::unordered_map<std::string, double>();
+    auto species_i = m_ptrS->getGeneSpecies(i);
+    std::size_t j;
+
+    for(j = 0; j < dim; ++j){
+      auto species_j = m_ptrS->getGeneSpecies(j);
+      if(species_i != species_j){
+        if(speciesMap.find(species_j) == speciesMap.end()){
+          // initialize minimum if key did not exist so far
+          speciesMap[species_j] = m_ptrS->getDistance(i, j);
+        } else {
+          // update the minimum
+          if(m_ptrS->getDistance(i, j) < speciesMap[species_j]){
+            speciesMap[species_j] = m_ptrS->getDistance(i, j);
+          }
+        }
+      }
+    }
+
+    for(j = 0; j < dim; ++j){
+      auto species_j = m_ptrS->getGeneSpecies(j);
+      if( (species_i != species_j) &&
+          (m_ptrS->getDistance(i, j) <= (1 + m_epsilon) * speciesMap[species_j])){
+        m_bmCandidates.at(i,j) = 1;
+      }
+    }
+  }
+
+  // // test output of the matrix
+  // for(std::size_t i = 0; i < dim; ++i){
+  //   for(std::size_t j = 0; j < dim; ++j){
+  //       std::cout << m_bmCandidates.at(i,j) << "  ";
+  //   }
+  //   std::cout << std::endl;
+  // }
+}
 
 std::vector<Gene*>
 BMGBuilder::chooseOutgroups(const std::vector<Gene*>& outgroupCandidates){
@@ -76,9 +119,9 @@ BMGBuilder::supportedQuartetMajority(const Gene* x, const Gene* y1,
   std::size_t zIdx = z->getIndex();
   std::size_t quartet;
 
-  double xy1_y2z = m_ptrDm->at(xIdx, y1Idx) + m_ptrDm->at(y2Idx, zIdx);
-  double xy2_y1z = m_ptrDm->at(xIdx, y2Idx) + m_ptrDm->at(y1Idx, zIdx);
-  double xz_y1y2 = m_ptrDm->at(xIdx, zIdx) + m_ptrDm->at(y1Idx, y2Idx);
+  double xy1_y2z = m_ptrS->getDistance(xIdx, y1Idx) + m_ptrS->getDistance(y2Idx, zIdx);
+  double xy2_y1z = m_ptrS->getDistance(xIdx, y2Idx) + m_ptrS->getDistance(y1Idx, zIdx);
+  double xz_y1y2 = m_ptrS->getDistance(xIdx, zIdx) + m_ptrS->getDistance(y1Idx, y2Idx);
 
   // 0: xy1 | y2z
   if(xy1_y2z < xy2_y1z && xy1_y2z < xz_y1y2){
@@ -107,9 +150,9 @@ BMGBuilder::supportedQuartetWeighted(const Gene* x, const Gene* y1,
   std::size_t quartet;
   double weight = 0.0;
 
-  double xy1_y2z = m_ptrDm->at(xIdx, y1Idx) + m_ptrDm->at(y2Idx, zIdx);
-  double xy2_y1z = m_ptrDm->at(xIdx, y2Idx) + m_ptrDm->at(y1Idx, zIdx);
-  double xz_y1y2 = m_ptrDm->at(xIdx, zIdx) + m_ptrDm->at(y1Idx, y2Idx);
+  double xy1_y2z = m_ptrS->getDistance(xIdx, y1Idx) + m_ptrS->getDistance(y2Idx, zIdx);
+  double xy2_y1z = m_ptrS->getDistance(xIdx, y2Idx) + m_ptrS->getDistance(y1Idx, zIdx);
+  double xz_y1y2 = m_ptrS->getDistance(xIdx, zIdx) + m_ptrS->getDistance(y1Idx, y2Idx);
 
   // 0: xy1 | y2z
   if(xy1_y2z < xy2_y1z && xy1_y2z < xz_y1y2){
@@ -137,6 +180,10 @@ BMGBuilder::supportedQuartetWeighted(const Gene* x, const Gene* y1,
 
 void
 BMGBuilder::buildBMG(){
+  // build a matrix to check whether y is a best match candidate for x
+  if(m_restrictY){
+    buildCandidateMatrix();
+  }
 
   // add all gene pointers to the graph
   for(Gene& gene : m_ptrS->getGenes()){
@@ -147,7 +194,7 @@ BMGBuilder::buildBMG(){
   for(Gene& x : m_ptrS->getGenes()){
     const std::vector<Gene*>& outgroupCandidates = m_ptrS->getOutgroups(&x);
     std::vector<Gene*> outgroupsZ = chooseOutgroups(outgroupCandidates);
-    std::cout << x.getIdentifier() << std::endl;
+
     for(const std::string& speciesY : m_ptrS->getSpeciesSubtree(x.getSubtree())){
 
       // skip the own species
@@ -174,7 +221,7 @@ BMGBuilder::buildBMG(){
         } else {
           genesY = std::vector<Gene*>();
           for(Gene* genePtr : allGenesY){
-            if(m_ptrBmc->at(x.getIndex(), genePtr->getIndex())){
+            if(m_bmCandidates.at(x.getIndex(), genePtr->getIndex())){
               genesY.push_back(genePtr);
             }
           }
