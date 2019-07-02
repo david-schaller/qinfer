@@ -10,7 +10,6 @@
 #include "Matrix.h"
 
 class Scenario {
-  friend class BMGBuilder;
 public:
   void addGenes(std::deque<Gene>& g);
 

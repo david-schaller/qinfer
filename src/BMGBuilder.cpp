@@ -11,31 +11,31 @@ void
 BMGBuilder::buildCandidateMatrix(){
   std::size_t dim {m_ptrS->getGenes().size()};
   m_bmCandidates.initMatrix(dim, 0);
+  double threshold = 1.0 + m_epsilon;
 
   for(std::size_t i = 0; i < dim; ++i){
     auto speciesMap = std::unordered_map<std::string, double>();
-    auto species_i = m_ptrS->getGeneSpecies(i);
-    std::size_t j;
+    const auto& species_i = m_ptrS->getGeneSpecies(i);
 
-    for(j = 0; j < dim; ++j){
-      auto species_j = m_ptrS->getGeneSpecies(j);
+    for(std::size_t j = 0; j < dim; ++j){
+      const auto& species_j = m_ptrS->getGeneSpecies(j);
       if(species_i != species_j){
         if(speciesMap.find(species_j) == speciesMap.end()){
           // initialize minimum if key did not exist so far
           speciesMap[species_j] = m_ptrS->getDistance(i, j);
         } else {
           // update the minimum
-          if(m_ptrS->getDistance(i, j) < speciesMap[species_j]){
-            speciesMap[species_j] = m_ptrS->getDistance(i, j);
+          if(m_ptrS->getDistance(i, j) < speciesMap.at(species_j)){
+            speciesMap.at(species_j) = m_ptrS->getDistance(i, j);
           }
         }
       }
     }
 
-    for(j = 0; j < dim; ++j){
-      auto species_j = m_ptrS->getGeneSpecies(j);
+    for(std::size_t j = 0; j < dim; ++j){
+      const auto& species_j = m_ptrS->getGeneSpecies(j);
       if( (species_i != species_j) &&
-          (m_ptrS->getDistance(i, j) <= (1 + m_epsilon) * speciesMap[species_j])){
+          (m_ptrS->getDistance(i, j) <= threshold * speciesMap.at(species_j))){
         m_bmCandidates.at(i,j) = 1;
       }
     }

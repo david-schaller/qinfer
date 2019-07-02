@@ -57,6 +57,14 @@ Scenario::parseDistanceMatrix(const char* filepath){
     ++lineCounter;
   }
   rebuildMap();
+
+  // // test output of the matrix
+  // for(std::size_t i = 0; i < m_distanceMatrix.getDim(); ++i){
+  //   for(std::size_t j = 0; j < m_distanceMatrix.getDim(); ++j){
+  //       std::cout << m_distanceMatrix.at(i,j) << "  ";
+  //   }
+  //   std::cout << std::endl;
+  // }
 }
 
 void
@@ -81,7 +89,7 @@ Scenario::parseDistanceMatrixRow(std::string row, std::size_t rowIdx){
     ++columnIdx;
   }
   // parse the last element
-  m_distanceMatrix.at(rowIdx, columnIdx - 1) = std::stod(token);
+  m_distanceMatrix.at(rowIdx, columnIdx - 1) = std::stod(row);
 }
 
 void
