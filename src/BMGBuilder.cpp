@@ -201,32 +201,31 @@ BMGBuilder::buildBMG(){
       if(x.getSpecies() == speciesY){
         continue;
       }
-
+      
+      // build the gene set Y
       const std::vector<Gene*>& allGenesY = m_ptrS->getSpeciesGenes(speciesY);
-      if(allGenesY.size() == 0){
+      std::vector<Gene*> genesY;
+      if(!m_restrictY){
+        genesY = std::vector<Gene*>(allGenesY);
+      } else {
+        genesY = std::vector<Gene*>();
+        for(Gene* genePtr : allGenesY){
+          if(m_bmCandidates.at(x.getIndex(), genePtr->getIndex())){
+            genesY.push_back(genePtr);
+          }
+        }
+      }
+
+      if(genesY.size() == 0){
         std::cerr << "Warning: Species without genes: "
                   << speciesY
                   << std::endl;
 
-      } else if (allGenesY.size() == 1){
+      } else if (genesY.size() == 1){
         // trivial case: only one gene in the species of Y
-        m_bmg.addEdge(&x, allGenesY[0]);
+        m_bmg.addEdge(&x, genesY[0]);
 
       } else {
-
-        // build the gene set Y
-        std::vector<Gene*> genesY;
-        if(!m_restrictY){
-          genesY = std::vector<Gene*>(allGenesY);
-        } else {
-          genesY = std::vector<Gene*>();
-          for(Gene* genePtr : allGenesY){
-            if(m_bmCandidates.at(x.getIndex(), genePtr->getIndex())){
-              genesY.push_back(genePtr);
-            }
-          }
-        }
-
         // find best matches in gene set Y
         for(Gene* bm : findBestMatches(&x, genesY, outgroupsZ)){
           m_bmg.addEdge(&x, bm);

@@ -61,6 +61,8 @@ $(BIN)/gtest_main.a : $(UT)/$(OBJ)/gtest-all.o $(UT)/$(OBJ)/gtest_main.o
 	mkdir -p $(BIN)
 	$(AR) $(ARFLAGS) $@ $^
 
+remake: clean all
+
 clean:
 	rm -rf $(OBJ)
 	rm -rf $(BIN)
