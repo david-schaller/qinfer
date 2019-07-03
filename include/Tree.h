@@ -36,9 +36,14 @@ public:
   void addChild(std::shared_ptr<TreeNode> parent, std::shared_ptr<TreeNode> child);
   std::string toNewick() const;
 
+  static Tree parseNewick(std::string newick);
+
 private:
   std::shared_ptr<TreeNode> m_root;
   std::string constructNewick(std::shared_ptr<TreeNode> node) const;
+
+  static void parseSubtree(std::shared_ptr<TreeNode> subRoot, std::string subtreeString);
+  static std::vector<std::string> splitChildren(std::string childString);
 };
 
 #endif /* TREE_H */
