@@ -1,31 +1,39 @@
-.PHONY: all tests clean
+.PHONY: all tests clean release remake
 
-GTEST_DIR = $(HOME)/development_cpp/gtest/googletest
+GTEST_DIR := $(HOME)/development_cpp/gtest/googletest
 
-GTEST_HEADERS = $(GTEST_DIR)/include/gtest/*.h \
+GTEST_HEADERS := $(GTEST_DIR)/include/gtest/*.h \
                 $(GTEST_DIR)/include/gtest/internal/*.h
-GTEST_SRCS_ = $(GTEST_DIR)/src/*.cc $(GTEST_DIR)/src/*.h $(GTEST_HEADERS)
+GTEST_SRCS_ := $(GTEST_DIR)/src/*.cc $(GTEST_DIR)/src/*.h $(GTEST_HEADERS)
 
-CC=gcc-9
-CXX=g++-9
-RM=rm -f
-CPPFLAGS=-g -Wall -Wextra -pthread -std=c++17
-LDFLAGS=-g -lstdc++fs
+CC := gcc-9
+CXX := g++-9
+RM := rm -f
+TARGET := qinfer
 
-TARGET=qinfer
+SRC := src
+INC := -I include
+OBJ := obj
+BIN := bin
+UT := unittest
 
-SRC=src
-INC=-I include
-OBJ=obj
-BIN=bin
-UT=unittest
+SRCS = $(shell find $(SRC) -name '*.cpp')
+UT_SRCS = $(shell find $(UT)/$(SRC) -name '*.cpp')
+OBJS = $(subst $(SRC)/,$(OBJ)/,$(subst .cpp,.o,$(SRCS)))
+UT_OBJS = $(subst $(SRC)/,$(OBJ)/,$(subst .cpp,.o,$(UT_SRCS)))
 
-SRCS=$(shell find $(SRC) -name '*.cpp')
-UT_SRCS=$(shell find $(UT)/$(SRC) -name '*.cpp')
-OBJS=$(subst $(SRC)/,$(OBJ)/,$(subst .cpp,.o,$(SRCS)))
-UT_OBJS=$(subst $(SRC)/,$(OBJ)/,$(subst .cpp,.o,$(UT_SRCS)))
+ifeq ($(RELEASE),true)
+	CPPFLAGS = -s -O3 -Wall -Wextra -pthread -std=c++17
+	LDFLAGS = -s -O3 -lstdc++fs
+else
+	CPPFLAGS = -g -Wall -Wextra -pthread -std=c++17
+	LDFLAGS = -g -lstdc++fs
+endif
 
 all: $(BIN)/$(TARGET)
+
+release:
+	make RELEASE=true
 
 tests: $(BIN)/unittest
 	./$(BIN)/unittest
