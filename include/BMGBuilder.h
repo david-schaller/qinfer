@@ -13,13 +13,15 @@ class BMGBuilder {
 public:
   BMGBuilder(Scenario* ptrS,
              std::size_t outgroupLimit,
-             bool restrictY, double epsilon=0.5,
-             bool weightedMode=false)
+             bool restrictY, double epsilon = 0.5,
+             bool weightedMode = false,
+             bool disableQuartet = false)
    : m_ptrS(ptrS)
    , m_outgroupLimit(outgroupLimit)
    , m_restrictY(restrictY)
    , m_epsilon(epsilon)
-   , m_weightedMode(weightedMode) { };
+   , m_weightedMode(weightedMode)
+   , m_disableQuartet(disableQuartet) { };
 
   void buildBMG();
   void printBMG();
@@ -30,10 +32,12 @@ private:
   bool m_restrictY;
   float m_epsilon;
   bool m_weightedMode;
+  bool m_disableQuartet;
 
   Matrix<int> m_bmCandidates;
   DiGraph<Gene*> m_bmg;
 
+  void epsilonMethod();
   void buildCandidateMatrix();
   std::vector<Gene*> chooseOutgroups(const std::vector<Gene*>& outgroupCandidates);
   std::vector<Gene*> findBestMatches(const Gene* x,

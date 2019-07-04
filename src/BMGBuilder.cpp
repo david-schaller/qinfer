@@ -8,6 +8,40 @@
 #include "DiGraph.h"
 
 void
+BMGBuilder::epsilonMethod(){
+  std::size_t dim {m_ptrS->getGenes().size()};
+  double threshold = 1.0 + m_epsilon;
+
+  for(std::size_t i = 0; i < dim; ++i){
+    auto speciesMap = std::unordered_map<std::string, double>();
+    const auto& species_i = m_ptrS->getGeneSpecies(i);
+
+    for(std::size_t j = 0; j < dim; ++j){
+      const auto& species_j = m_ptrS->getGeneSpecies(j);
+      if(species_i != species_j){
+        if(speciesMap.find(species_j) == speciesMap.end()){
+          // initialize minimum if key did not exist so far
+          speciesMap[species_j] = m_ptrS->getDistance(i, j);
+        } else {
+          // update the minimum
+          if(m_ptrS->getDistance(i, j) < speciesMap.at(species_j)){
+            speciesMap.at(species_j) = m_ptrS->getDistance(i, j);
+          }
+        }
+      }
+    }
+
+    for(std::size_t j = 0; j < dim; ++j){
+      const auto& species_j = m_ptrS->getGeneSpecies(j);
+      if( (species_i != species_j) &&
+          (m_ptrS->getDistance(i, j) <= threshold * speciesMap.at(species_j))){
+        m_bmg.addEdge(m_ptrS->getGenePtr(i), m_ptrS->getGenePtr(j));
+      }
+    }
+  }
+}
+
+void
 BMGBuilder::buildCandidateMatrix(){
   std::size_t dim {m_ptrS->getGenes().size()};
   m_bmCandidates.initMatrix(dim, 0);
@@ -180,14 +214,20 @@ BMGBuilder::supportedQuartetWeighted(const Gene* x, const Gene* y1,
 
 void
 BMGBuilder::buildBMG(){
-  // build a matrix to check whether y is a best match candidate for x
-  if(m_restrictY){
-    buildCandidateMatrix();
-  }
-
   // add all gene pointers to the graph
   for(Gene& gene : m_ptrS->getGenes()){
     m_bmg.addNode(&gene);
+  }
+
+  // use the simple epsilon method if m_disableQuartet is true
+  if(m_disableQuartet){
+    epsilonMethod();
+    return;
+  }
+
+  // build a matrix to check whether y is a best match candidate for x
+  if(m_restrictY){
+    buildCandidateMatrix();
   }
 
   // main algorithm
@@ -201,7 +241,7 @@ BMGBuilder::buildBMG(){
       if(x.getSpecies() == speciesY){
         continue;
       }
-      
+
       // build the gene set Y
       const std::vector<Gene*>& allGenesY = m_ptrS->getSpeciesGenes(speciesY);
       std::vector<Gene*> genesY;

@@ -21,6 +21,7 @@ public:
     return m_genes[i].getSpecies();
   };
   inline std::deque<Gene>& getGenes() { return m_genes; };
+  inline Gene* getGenePtr(std::size_t idx) { return &(m_genes[idx]); }
   inline const std::vector<Gene*>& getSpeciesGenes(std::string species) const {
     return m_speciesGenes.at(species);
   };
