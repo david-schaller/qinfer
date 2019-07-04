@@ -1,7 +1,9 @@
 #include <fstream>
 #include <iostream>
+#include <set>
 
 #include "Scenario.h"
+#include "Tree.h"
 
 void
 Scenario::addGenes(std::deque<Gene>& g)
@@ -132,7 +134,7 @@ Scenario::parseSpeciesGenesLine(std::string line){
         g.push_back(m_geneAssignments.at(token));
         m_geneAssignments.at(token)->setSpecies(species);
       } catch(const std::out_of_range&) {
-        std::cout << "WARNING: Species-to-genes-file contains additional entries: "
+        std::cerr << "WARNING: Species-to-genes-file contains additional entries: "
                   << token
                   << std::endl;
       }
@@ -143,7 +145,7 @@ Scenario::parseSpeciesGenesLine(std::string line){
     g.push_back(m_geneAssignments.at(line));
     m_geneAssignments.at(line)->setSpecies(species);
   } catch(const std::out_of_range&) {
-    std::cout << "WARNING: Species-to-genes-file contains additional entries: "
+    std::cerr << "WARNING: Species-to-genes-file contains additional entries: "
               << line
               << std::endl;
   }
@@ -152,7 +154,7 @@ Scenario::parseSpeciesGenesLine(std::string line){
 }
 
 void
-Scenario::parseSTreeSubtrees(const char* filepath){
+Scenario::parseSTreeSubtrees(const char* filepath, bool parseNewick){
   std::ifstream filestream(std::string(filepath), std::ios::binary);
 
   if(!filestream) {
@@ -160,8 +162,14 @@ Scenario::parseSTreeSubtrees(const char* filepath){
   }
 
   std::string line;
-  while(std::getline(filestream, line)) {
-    parseSTreeSubtreeLine(line);
+
+  if(parseNewick){
+    std::getline(filestream, line);
+    parseNewickAndCheck(line);
+  } else {
+    while(std::getline(filestream, line)) {
+      parseSTreeSubtreeLine(line);
+    }
   }
 
   // for(auto it = m_STreeSubtrees.begin(); it != m_STreeSubtrees.end(); ++it){
@@ -171,8 +179,29 @@ Scenario::parseSTreeSubtrees(const char* filepath){
   //   std::cout << std::endl;
   // }
 
+  // check if all species with genes are in the ssubtree lists
+  checkSpeciesAvailability();
   // build the corresponding lists of outgroup genes
   buildOutgroupInfo();
+}
+
+void
+Scenario::parseNewickAndCheck(std::string line){
+  Tree specTree = Tree::parseNewick(line);
+  std::vector<std::vector<std::string>> subtrees = specTree.speciesInSubtrees();
+  for(auto& subtree : subtrees){
+    m_STreeSubtrees.push_back(std::vector<std::string>());
+    for(auto& species : subtree){
+      if(m_speciesGenes.find(species) == m_speciesGenes.end()){
+        std::cerr << "WARNING: Newick tree contains species without genes: "
+                  << species
+                  << " (omitted)"
+                  << std::endl;
+      } else {
+        m_STreeSubtrees.back().push_back(species);
+      }
+    }
+  }
 }
 
 void
@@ -188,7 +217,7 @@ Scenario::parseSTreeSubtreeLine(std::string line){
     line.erase(0, pos + delimiter.length());
 
     if(m_speciesGenes.find(token) == m_speciesGenes.end()){
-      std::cout << "WARNING: Species-subtrees-file contains species without genes: "
+      std::cerr << "WARNING: Species-subtrees-file contains species without genes: "
                 << token
                 << " (omitted)"
                 << std::endl;
@@ -198,13 +227,32 @@ Scenario::parseSTreeSubtreeLine(std::string line){
   }
   // push back last line element
   if(m_speciesGenes.find(line) == m_speciesGenes.end()){
-    std::cout << "WARNING: Species-subtrees-file contains species without genes: "
+    std::cerr << "WARNING: Species-subtrees-file contains species without genes: "
               << line
               << " (omitted)"
               << std::endl;
   } else {
     m_STreeSubtrees.back().push_back(line);
   }
+}
+
+void
+Scenario::checkSpeciesAvailability(){
+  auto necessarySpecies = std::set<std::string>();
+  for(auto& species : m_speciesGenes){
+    necessarySpecies.insert(species.first);
+  }
+
+  for(auto& subtree : m_STreeSubtrees){
+    for(auto& species : subtree){
+      if(necessarySpecies.find(species) == necessarySpecies.end()){
+        throw std::runtime_error("Could not assign species to subtree: " + species);
+      } else {
+        necessarySpecies.erase(species);
+      }
+    }
+  }
+
 }
 
 void

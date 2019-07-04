@@ -15,7 +15,7 @@ public:
 
   void parseDistanceMatrix(const char* filepath);
   void parseSpeciesGenes(const char* filepath);
-  void parseSTreeSubtrees(const char* filepath);
+  void parseSTreeSubtrees(const char* filepath, bool parseNewick);
 
   inline const std::string& getGeneSpecies(int i) const {
     return m_genes[i].getSpecies();
@@ -45,7 +45,9 @@ private:
   void rebuildMap();
   void parseDistanceMatrixRow(std::string row, std::size_t rowIdx);
   void parseSpeciesGenesLine(std::string line);
+  void parseNewickAndCheck(std::string line);
   void parseSTreeSubtreeLine(std::string line);
+  void checkSpeciesAvailability();
   void buildOutgroupInfo();
 };
 

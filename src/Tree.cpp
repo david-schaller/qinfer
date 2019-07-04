@@ -1,5 +1,6 @@
 #include <iostream>
 #include <stdexcept>
+#include <vector>
 
 #include "Tree.h"
 
@@ -29,20 +30,57 @@ Tree::constructNewick(std::shared_ptr<TreeNode> node) const {
 
 Tree
 Tree::parseNewick(std::string newick){
-  std::cout << "parseNewick" << std::endl;
 
   if(newick.find(';') != std::string::npos){
     newick.erase(newick.find(';'), newick.size());
   }
 
   auto tempRoot = std::make_shared<TreeNode>(std::basic_string("-1"));
+  auto tree = Tree(std::shared_ptr<TreeNode>());
 
-  parseSubtree(tempRoot, newick);
+  parseSubtree(tree, tempRoot, newick);
+
+  if(tempRoot->hasChildren()){
+    // remove the temporary root
+    tree.m_root = tempRoot->m_children[0];
+    tempRoot->m_children.clear();
+    tree.m_root->m_parent.reset();
+  } else {
+    throw std::invalid_argument( "invalid Newick string! (empty)" );
+  }
+
+  return tree;
 }
 
 void
-Tree::parseSubtree(std::shared_ptr<TreeNode> subRoot, std::string subtreeString){
+Tree::parseSubtree(Tree& tree,
+                   std::shared_ptr<TreeNode> subRoot,
+                   std::string subtreeString){
   auto children = splitChildren(subtreeString);
+
+  for(std::string& child : children){
+
+    auto node = std::make_shared<TreeNode>(std::basic_string(""));
+    tree.addChild(subRoot, node);
+
+    std::size_t subtreeEnd = std::string::npos;
+    if(child.size() > 1 && child.at(0) == '('){
+      subtreeEnd = child.rfind(')');
+      if(subtreeEnd == std::string::npos){
+        throw std::invalid_argument( "invalid Newick string! (brackets 1)" );
+      } else {
+        parseSubtree(tree, node, child.substr(1, subtreeEnd-1));
+        child.erase(0, subtreeEnd+1);
+      }
+    }
+
+    // assign value to node (trim distance information)
+    if(child.find(":") != std::string::npos){
+      node->m_value = child.substr(0, child.find(":"));
+    } else {
+      node->m_value = child;
+    }
+  }
 }
 
 std::vector<std::string>
@@ -60,7 +98,7 @@ Tree::splitChildren(std::string childString){
       current.append(1, c);
     } else if(c == ')'){
       if(stack <= 0){
-        throw std::invalid_argument( "invalid Newick string!" );
+        throw std::invalid_argument( "invalid Newick string! (brackets 2)" );
       }
       --stack;
       current.append(1, c);
@@ -71,4 +109,35 @@ Tree::splitChildren(std::string childString){
   children.push_back(current);
 
   return children;
+}
+
+std::vector<std::vector<std::string>>
+Tree::speciesInSubtrees() const {
+  auto subtrees = std::vector<std::vector<std::string>>();
+
+  // walk to the true root i.e. the first with multiple children (rho_S)
+  std::shared_ptr<TreeNode> pos(m_root);
+  while (pos->m_children.size() == 1) {
+    pos = pos->m_children[0];
+  }
+
+  // fill the lists
+  for(auto& child : pos->m_children){
+    subtrees.push_back(std::vector<std::string>());
+    fillSubtreeVector(child, subtrees.back());
+  }
+
+  return subtrees;
+}
+
+void
+Tree::fillSubtreeVector(std::shared_ptr<TreeNode> node,
+                        std::vector<std::string>& subtree) const {
+  if(!node->hasChildren()){
+    subtree.push_back(node->getValue());
+  } else {
+    for(auto& child : node->m_children){
+      fillSubtreeVector(child, subtree);
+    }
+  }
 }

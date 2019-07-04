@@ -21,9 +21,17 @@ TEST(TreeTest, Basic) {
   tree.addChild(tn1, tn2);
   tree.addChild(tn1, tn3);
 
-  std::cout << tree.toNewick() << std::endl;
+  std::string newick = tree.toNewick();
 
-  EXPECT_EQ(1, 1);
+  std::cout << newick << std::endl;
+
+  newick = "(A,B,((C,E),D));"; //"(A:0.1,B:0.2,(C:0.3,D:0.4):0.5);";
+
+  Tree tree2 = Tree::parseNewick(newick);
+  std::string newick2 = tree2.toNewick();
+  std::cout << newick2 << std::endl;
+
+  EXPECT_EQ(newick, newick2);
 }
 
 }  // namespace

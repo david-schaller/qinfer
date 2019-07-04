@@ -40,13 +40,20 @@ main(int argc, char* argv[]) -> int
   bool restrictY = false;
   double epsilon = 0.5;
   bool weightedMode = false;
+  bool parseNewick = false;
   if(argc > 4){
     int pos = 4;
     while (pos < argc) {
-      if(std::basic_string(argv[pos]) == "-w"){
+      if((std::basic_string(argv[pos]) == "-w") ||
+         (std::basic_string(argv[pos]) == "--weighted")){
         weightedMode = true;
         ++pos;
-      } else if (std::basic_string(argv[pos]) == "-e"){
+      } else if((std::basic_string(argv[pos]) == "-n") ||
+                (std::basic_string(argv[pos]) == "--newick")){
+        parseNewick = true;
+        ++pos;
+      } else if((std::basic_string(argv[pos]) == "-e") ||
+                (std::basic_string(argv[pos]) == "--epsilon")){
         if(pos+1 < argc){
           restrictY = true;
           epsilon = std::stod(std::basic_string(argv[pos+1]));
@@ -63,7 +70,8 @@ main(int argc, char* argv[]) -> int
   auto s = Scenario();
   s.parseDistanceMatrix(argv[1]);
   s.parseSpeciesGenes(argv[2]);
-  s.parseSTreeSubtrees(argv[3]);
+  s.parseSTreeSubtrees(argv[3], parseNewick);
+
 
   std::size_t outgroupLimit = 10;
   auto bmgB = BMGBuilder(&s, outgroupLimit, restrictY,
