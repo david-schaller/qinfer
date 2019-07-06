@@ -85,9 +85,9 @@ main(int argc, char* argv[]) -> int
 
   std::size_t outgroupLimit = 10;
   auto bmgBuilder = BMGBuilder(&s, outgroupLimit, restrictY,
-                               epsilon=epsilon,
-                               weightedMode=weightedMode,
-                               disableQuartet=disableQuartet);
+                               epsilon == epsilon,
+                               weightedMode == weightedMode,
+                               disableQuartet == disableQuartet);
   bmgBuilder.buildBMG();
   bmgBuilder.printBMG();
 
