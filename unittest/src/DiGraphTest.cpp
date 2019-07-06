@@ -2,8 +2,6 @@
 
 #include <vector>
 
-#include <iostream>
-
 #include "DiGraph.h"
 
 namespace {
@@ -51,6 +49,7 @@ TEST(DiGraphTest, SCCS) {
   auto neighbors = dg.getNeighbors(&i1);
   std::vector<int*> neighbors_expected{ &i2, &i3 };
 
+  /*
   auto sccs = dg.stronglyConnectedComponents();
   for(auto scc : sccs){
     for(auto item : scc){
@@ -58,13 +57,16 @@ TEST(DiGraphTest, SCCS) {
     }
     std::cout << std::endl;
   }
+  */
 
+  /*
   auto sccWithoutOutedges = dg.getSccWithoutOutedges();
   std::cout << "scc without out-edges: ";
   for(auto item : sccWithoutOutedges){
     std::cout << *item << "  ";
   }
   std::cout << std::endl;
+  */
 
   EXPECT_EQ(neighbors, neighbors_expected);
 }
