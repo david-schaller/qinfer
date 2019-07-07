@@ -1,5 +1,5 @@
-#ifndef DIGRAPH_T
-#define DIGRAPH_T
+#ifndef DIGRAPH_H
+#define DIGRAPH_H
 
 #include <vector>
 #include <map>
@@ -164,4 +164,4 @@ DiGraph<T>::getSccWithoutOutedges() const {
   return result;
 }
 
-#endif /* DIGRAPH_T */
+#endif /* DIGRAPH_H */
