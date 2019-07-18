@@ -179,7 +179,7 @@ Scenario::parseSTreeSubtrees(const char* filepath, bool parseNewick){
   //   std::cout << std::endl;
   // }
 
-  // check if all species with genes are in the ssubtree lists
+  // check if all species with genes are in the subtree lists
   checkSpeciesAvailability();
   // build the corresponding lists of outgroup genes
   buildOutgroupInfo();
@@ -187,8 +187,8 @@ Scenario::parseSTreeSubtrees(const char* filepath, bool parseNewick){
 
 void
 Scenario::parseNewickAndCheck(std::string line){
-  Tree specTree = Tree::parseNewick(line);
-  std::vector<std::vector<std::string>> subtrees = specTree.speciesInSubtrees();
+  m_STree = Tree::parseNewick(line);
+  std::vector<std::vector<std::string>> subtrees = m_STree.speciesInSubtrees();
   for(auto& subtree : subtrees){
     m_STreeSubtrees.push_back(std::vector<std::string>());
     for(auto& species : subtree){

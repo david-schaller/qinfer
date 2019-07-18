@@ -8,6 +8,7 @@
 
 #include "Gene.h"
 #include "Matrix.h"
+#include "Tree.h"
 
 class Scenario {
 public:
@@ -28,6 +29,7 @@ public:
   inline const double& getDistance(std::size_t row, std::size_t column) const {
     return m_distanceMatrix.at(row, column);
   };
+  inline Tree& getSTree() { return m_STree; };
 
   const std::vector<Gene*>& getOutgroups(Gene* genePtr) const;
   const std::vector<std::string>& getSpeciesSubtree(std::size_t subtreeIdx) const;
@@ -37,6 +39,7 @@ private:
   Matrix<double> m_distanceMatrix;
   std::unordered_map<std::string, Gene*> m_geneAssignments;
   std::unordered_map<std::string, std::vector<Gene*>> m_speciesGenes;
+  Tree m_STree;
 
   // list of lists of species identifiers belonging to the same m_STreeSubtree
   // of the species tree root and corresponding outgroup genes

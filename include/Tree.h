@@ -12,10 +12,18 @@ public:
     : m_value(value) { };
 
   inline std::string getValue() const { return m_value; };
+  inline std::size_t getNodeIdx() const { return m_nodeIdx; };
+  inline std::size_t getLeafIdx() const { return m_leafIdx; };
   inline bool hasParent() const { return !m_parent.expired(); };
   inline bool hasChildren() const { return !m_children.empty(); };
   inline const std::vector<std::shared_ptr<TreeNode>>& getChildren() const {
     return m_children;
+  };
+  inline const std::vector<std::shared_ptr<TreeNode>>& getLeaves() const {
+    return m_leaves;
+  };
+  inline const std::weak_ptr<TreeNode>& getParent() const {
+    return m_parent;
   };
 
   std::shared_ptr<TreeNode> addChild(std::string value,
@@ -23,17 +31,28 @@ public:
 
 private:
   std::string m_value;
+  std::size_t m_nodeIdx = -1;
+  std::size_t m_leafIdx = -1;
   std::vector<std::shared_ptr<TreeNode>> m_children;
   std::weak_ptr<TreeNode> m_parent;
+  std::vector<std::shared_ptr<TreeNode>> m_leaves;
 };
 
 
 class Tree {
 public:
+  Tree()
+    : m_root(std::shared_ptr<TreeNode>()) { };
   Tree(std::shared_ptr<TreeNode> root)
     : m_root(root) { };
 
+  inline std::size_t getNodeNumber() const { return m_nodeCounter; };
+  inline std::size_t getLeafNumber() const { return m_leafCounter; };
+
   void addChild(std::shared_ptr<TreeNode> parent, std::shared_ptr<TreeNode> child);
+  void supplyLeaves(std::shared_ptr<TreeNode> node = nullptr);
+  const std::vector<std::shared_ptr<TreeNode>>& getPreorder();
+
   std::string toNewick() const;
   static Tree parseNewick(std::string newick);
 
@@ -41,6 +60,14 @@ public:
 
 private:
   std::shared_ptr<TreeNode> m_root;
+  std::vector<std::shared_ptr<TreeNode>> m_preorder;
+  std::size_t m_nodeCounter = 0;
+  std::size_t m_leafCounter = 0;
+  bool m_preorderUpToDate = false;
+
+  void buildPreorder(std::shared_ptr<TreeNode> node = nullptr);
+  void initPreorderAndIndex(std::shared_ptr<TreeNode> node = nullptr);
+
   std::string constructNewick(std::shared_ptr<TreeNode> node) const;
 
   static void parseSubtree(Tree& tree,

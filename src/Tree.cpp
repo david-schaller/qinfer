@@ -6,8 +6,78 @@
 
 void
 Tree::addChild(std::shared_ptr<TreeNode> parent, std::shared_ptr<TreeNode> child){
+  ++m_nodeCounter;
+  if(parent->hasChildren()){
+    ++m_leafCounter;
+  }
   parent->m_children.push_back(std::shared_ptr<TreeNode>(child));
   child->m_parent = parent->m_children.back();
+
+  m_preorderUpToDate = false;
+}
+
+void
+Tree::buildPreorder(std::shared_ptr<TreeNode> node){
+
+  if(node == nullptr){
+    m_preorder.clear();
+    buildPreorder(m_root);
+    m_preorderUpToDate = true;
+
+  } else {
+    m_preorder.push_back(node);
+    for(auto child : node->getChildren()){
+      buildPreorder(child);
+    }
+  }
+}
+
+void
+Tree::initPreorderAndIndex(std::shared_ptr<TreeNode> node){
+
+  if(node == m_root){
+    m_preorder.clear();
+    m_nodeCounter = 0;
+    m_leafCounter = 0;
+    initPreorderAndIndex(m_root);
+    m_preorderUpToDate = true;
+
+  } else {
+    m_preorder.push_back(node);
+    node->m_nodeIdx = m_nodeCounter++;
+    if(!node->hasChildren()){
+      node->m_leafIdx = m_leafCounter++;
+    }
+
+    for(auto child : node->getChildren()){
+      initPreorderAndIndex(child);
+    }
+  }
+}
+
+const std::vector<std::shared_ptr<TreeNode>>&
+Tree::getPreorder(){
+  if(!m_preorderUpToDate){
+    buildPreorder();
+  }
+  return m_preorder;
+}
+
+void
+Tree::supplyLeaves(std::shared_ptr<TreeNode> node){
+  if(node == nullptr){
+    supplyLeaves(m_root);
+  } else if(!node->hasChildren()){
+    node->m_leaves = {node};
+  } else {
+    node->m_leaves.clear();
+    for(auto child : node->getChildren()){
+      supplyLeaves(child);
+      node->m_leaves.insert(node->m_leaves.end(),
+                            child->m_leaves.begin(),
+                            child->m_leaves.end());
+    }
+  }
 }
 
 std::string
@@ -49,6 +119,8 @@ Tree::parseNewick(std::string newick){
     throw std::invalid_argument( "invalid Newick string! (empty)" );
   }
 
+  tree.initPreorderAndIndex();
+
   return tree;
 }
 
@@ -60,7 +132,7 @@ Tree::parseSubtree(Tree& tree,
 
   for(std::string& child : children){
 
-    auto node = std::make_shared<TreeNode>(std::basic_string(""));
+    auto node = std::make_shared<TreeNode>(std::string(""));
     tree.addChild(subRoot, node);
 
     std::size_t subtreeEnd = std::string::npos;
