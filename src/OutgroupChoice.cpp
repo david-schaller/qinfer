@@ -140,7 +140,8 @@ OutgroupChoice::computeOutgroups(){
                       m_ptrS->getSpeciesGenes(speciesC2[j]->getValue()).end());
 
                 std::vector<double> votes {0.0, 0.0};
-                for(int k = 0; k < 20; ++k){
+//                for(std::size_t k = 0; k < m_outgroupLimit; ++k){
+                for(std::size_t k = 0; k < 20; ++k){
                   auto a_b = std::vector<Gene*>();
                   std::sample(genesC1.begin(), genesC1.end(),
                               std::back_inserter(a_b),
@@ -165,7 +166,7 @@ OutgroupChoice::computeOutgroups(){
                   }
                 }
 
-                if(votes[1] / (votes[0]+votes[1]) >= 0.2){
+                if(votes[1] / (votes[0]+votes[1]) >= m_incongruentThreshold){
                   outgroupCandidates.erase(speciesC2[i]);
                   outgroupCandidates.erase(speciesC2[j]);
                 }

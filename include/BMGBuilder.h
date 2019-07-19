@@ -18,7 +18,8 @@ public:
              bool restrictY, double epsilon = 0.5,
              bool weightedMode = false,
              bool disableQuartet = false,
-             bool relativeOutgroups = true)
+             bool relativeOutgroups = false,
+             double incongruentThreshold = 0.2)
    : m_ptrS(ptrS)
    , m_outgroupLimit(outgroupLimit)
    , m_restrictY(restrictY)
@@ -28,7 +29,8 @@ public:
    , m_quartets(Quartets(ptrS, weightedMode))
    , m_outgroupChoice (OutgroupChoice(ptrS, &m_quartets,
                                       outgroupLimit,
-                                      weightedMode)) { };
+                                      weightedMode,
+                                      incongruentThreshold)) { };
 
   void buildBMG();
   void printBMG();

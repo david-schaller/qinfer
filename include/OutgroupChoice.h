@@ -17,11 +17,13 @@ class OutgroupChoice {
 public:
   OutgroupChoice(Scenario* ptrS, Quartets* ptrQ,
                  std::size_t outgroupLimit,
-                 bool weightedMode = false)
+                 bool weightedMode = false,
+                 double incongruentThreshold = 0.2)
     : m_ptrS(ptrS)
     , m_ptrQ(ptrQ)
     , m_outgroupLimit(outgroupLimit)
-    , m_weightedMode(weightedMode) { };
+    , m_weightedMode(weightedMode)
+    , m_incongruentThreshold(incongruentThreshold) { };
 
   void initialize();
   std::vector<Gene*> getClosest(Gene* x, std::vector<Gene*>& genesY);
@@ -31,6 +33,7 @@ private:
   Quartets* m_ptrQ;
   std::size_t m_outgroupLimit;
   bool m_weightedMode;
+  double m_incongruentThreshold;
 
   Matrix<std::size_t> m_I;
   Matrix<std::size_t> m_lcaS;
