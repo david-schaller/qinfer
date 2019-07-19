@@ -16,7 +16,7 @@ public:
 
   void parseDistanceMatrix(const char* filepath);
   void parseSpeciesGenes(const char* filepath);
-  void parseSTreeSubtrees(const char* filepath, bool parseNewick);
+  void parseSTreeSubtrees(const char* filepath, bool subtreeFiles);
 
   inline const std::string& getGeneSpecies(int i) const {
     return m_genes[i].getSpecies();

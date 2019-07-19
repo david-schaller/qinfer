@@ -8,6 +8,8 @@
 #include "Scenario.h"
 #include "DiGraph.h"
 #include "Matrix.h"
+#include "Quartets.h"
+#include "OutgroupChoice.h"
 
 class BMGBuilder {
 public:
@@ -15,13 +17,18 @@ public:
              std::size_t outgroupLimit,
              bool restrictY, double epsilon = 0.5,
              bool weightedMode = false,
-             bool disableQuartet = false)
+             bool disableQuartet = false,
+             bool relativeOutgroups = true)
    : m_ptrS(ptrS)
    , m_outgroupLimit(outgroupLimit)
    , m_restrictY(restrictY)
    , m_epsilon(epsilon)
-   , m_weightedMode(weightedMode)
-   , m_disableQuartet(disableQuartet) { };
+   , m_disableQuartet(disableQuartet)
+   , m_relativeOutgroups(relativeOutgroups)
+   , m_quartets(Quartets(ptrS, weightedMode))
+   , m_outgroupChoice (OutgroupChoice(ptrS, &m_quartets,
+                                      outgroupLimit,
+                                      weightedMode)) { };
 
   void buildBMG();
   void printBMG();
@@ -31,26 +38,24 @@ private:
   std::size_t m_outgroupLimit;
   bool m_restrictY;
   float m_epsilon;
-  bool m_weightedMode;
   bool m_disableQuartet;
+  bool m_relativeOutgroups;
+  Quartets m_quartets;
+  OutgroupChoice m_outgroupChoice;
 
   Matrix<int> m_bmCandidates;
   DiGraph<Gene*> m_bmg;
 
+  // COMMON FUNCTIONS
   void epsilonMethod();
   void buildCandidateMatrix();
+
+  // OUTGROUP METHOD I
   std::vector<Gene*> chooseOutgroups(const std::vector<Gene*>& outgroupCandidates);
-  std::vector<Gene*> findBestMatches(const Gene* x,
-                                     const std::vector<Gene*>& genesY,
-                                     const std::vector<Gene*>& outgroupsZ);
-  std::size_t supportedQuartetMajority(const Gene* x,
-                                       const Gene* y1,
-                                       const Gene* y2,
-                                       const Gene* z);
-  std::pair<std::size_t,double> supportedQuartetWeighted(const Gene* x,
-                                                         const Gene* y1,
-                                                         const Gene* y2,
-                                                         const Gene* z);
+  void buildRootOutgroups();
+
+  // OUTGROUP METHOD II
+  void buildRelativeOutgroups();
 };
 
 #endif /* BMGBUILDER_H */

@@ -24,7 +24,7 @@ main(int argc, char* argv[]) -> int
   bool restrictY = false;
   double epsilon = 0.5;
   bool weightedMode = false;
-  bool parseNewick = false;
+  bool subtreeFiles = false;
   int pos = 3;
   while (pos < argc) {
 
@@ -37,9 +37,10 @@ main(int argc, char* argv[]) -> int
       weightedMode = true;
       ++pos;
 
-    } else if((std::basic_string(argv[pos]) == "-n") ||
-              (std::basic_string(argv[pos]) == "--newick")){
-      parseNewick = true;
+    // use subtree files instead of newick species tree
+    } else if((std::basic_string(argv[pos]) == "-s") ||
+              (std::basic_string(argv[pos]) == "--subtree-files")){
+      subtreeFiles = true;
       ++pos;
 
     } else if((std::basic_string(argv[pos]) == "-e") ||
@@ -80,7 +81,7 @@ main(int argc, char* argv[]) -> int
   s.parseDistanceMatrix(argv[1]);
   s.parseSpeciesGenes(argv[2]);
   if(!disableQuartet){
-    s.parseSTreeSubtrees(argv[3], parseNewick);
+    s.parseSTreeSubtrees(argv[3], subtreeFiles);
   }
 
   std::size_t outgroupLimit = 10;

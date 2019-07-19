@@ -1,17 +1,16 @@
 #include <algorithm>
 #include <random>
-#include <cmath>
 
 #include "OutgroupChoice.h"
 
 void
-OutgroupChoice::quicksortRow(std::size_t row, std::size_t l, std::size_t r){
+OutgroupChoice::quicksortRow(std::size_t row, int l, int r){
   if(r <= l){
     return;
   }
-  std::size_t i = l;
-  std::size_t j = r;
-  int piv = m_ptrS->getDistance(row, m_I.at(row, (l+r)/2));
+  int i = l;
+  int j = r;
+  double piv = m_ptrS->getDistance(row, m_I.at(row, (l+r)/2));
 
   while(i <= j){
 
@@ -23,7 +22,7 @@ OutgroupChoice::quicksortRow(std::size_t row, std::size_t l, std::size_t r){
     }
 
     if(i <= j){
-      int temp = m_I.at(row, i);
+      std::size_t temp = m_I.at(row, i);
       m_I.at(row, i) = m_I.at(row, j);
       m_I.at(row, j) = temp;
       ++i;
@@ -76,11 +75,16 @@ OutgroupChoice::computeLcaS(){
 
     auto& children = v->getChildren();
     if(!v->hasChildren()){
-      m_lcaS.at(vid, vid) = vid;
+      m_lcaS.at(v->getLeafIdx(), v->getLeafIdx()) = vid;
+      // fill the species identifier --> leaf index map
+      m_speciesLeafIdx[v->getValue()] = v->getLeafIdx();
+
     } else if (children.size() >= 2){
+      // for all combinations of 2 children of v
       for(std::size_t i = 0; i < children.size()-1; ++i){
         for(std::size_t j = i; j < children.size(); ++j){
 
+          // for all combinations of 2 genes from the respective species
           for(auto& l1 : children[i]->getLeaves()){
             for(auto& l2 : children[j]->getLeaves()){
               m_lcaS.at(l1->getLeafIdx(), l2->getLeafIdx()) = vid;
@@ -146,14 +150,14 @@ OutgroupChoice::computeOutgroups(){
                               std::back_inserter(c_d),
                               2, std::mt19937{std::random_device{}()});
                   if(m_weightedMode){
-                    auto voteAndWeight = supportedQuartetWeighted(a_b[0], a_b[1], c_d[0], c_d[1]);
+                    auto voteAndWeight = m_ptrQ->supportedQuartetWeighted(a_b[0], a_b[1], c_d[0], c_d[1]);
                     if(voteAndWeight.first == 0){
                       votes[0] += voteAndWeight.second;
                     } else {
                       votes[1] += voteAndWeight.second;
                     }
                   } else {
-                    if(supportedQuartetMajority(a_b[0], a_b[1], c_d[0], c_d[1]) == 0){
+                    if(m_ptrQ->supportedQuartetMajority(a_b[0], a_b[1], c_d[0], c_d[1]) == 0){
                       votes[0] += 1.0;
                     } else {
                       votes[1] += 1.0;
@@ -183,70 +187,32 @@ OutgroupChoice::computeOutgroups(){
   }
 }
 
-std::size_t
-OutgroupChoice::supportedQuartetMajority(const Gene* x, const Gene* y1,
-                                         const Gene* y2, const Gene* z){
-  std::size_t xIdx = x->getIndex();
-  std::size_t y1Idx = y1->getIndex();
-  std::size_t y2Idx = y2->getIndex();
-  std::size_t zIdx = z->getIndex();
-  std::size_t quartet;
-
-  double xy1_y2z = m_ptrS->getDistance(xIdx, y1Idx) + m_ptrS->getDistance(y2Idx, zIdx);
-  double xy2_y1z = m_ptrS->getDistance(xIdx, y2Idx) + m_ptrS->getDistance(y1Idx, zIdx);
-  double xz_y1y2 = m_ptrS->getDistance(xIdx, zIdx) + m_ptrS->getDistance(y1Idx, y2Idx);
-
-  // 0: xy1 | y2z
-  if(xy1_y2z < xy2_y1z && xy1_y2z < xz_y1y2){
-    quartet = 0;
-  // 1: xy2 | y1z
-  } else if(xy2_y1z < xy1_y2z && xy2_y1z < xz_y1y2){
-    quartet = 1;
-  // 2: xz | y1y2
-  } else if(xz_y1y2 < xy1_y2z && xz_y1y2 < xy2_y1z){
-    quartet = 2;
-  // 3: star topology
-  } else {
-    quartet = 3;
-  }
-
-  return quartet;
+void
+OutgroupChoice::initialize(){
+  buildIMatrix();
+  computeLcaS();
+  computeOutgroups();
 }
 
-std::pair<std::size_t,double>
-OutgroupChoice::supportedQuartetWeighted(const Gene* x, const Gene* y1,
-                                         const Gene* y2, const Gene* z){
-  std::size_t xIdx = x->getIndex();
-  std::size_t y1Idx = y1->getIndex();
-  std::size_t y2Idx = y2->getIndex();
-  std::size_t zIdx = z->getIndex();
-  std::size_t quartet;
-  double weight = 0.0;
+std::vector<Gene*>
+OutgroupChoice::getClosest(Gene* x, std::vector<Gene*>& genesY){
 
-  double xy1_y2z = m_ptrS->getDistance(xIdx, y1Idx) + m_ptrS->getDistance(y2Idx, zIdx);
-  double xy2_y1z = m_ptrS->getDistance(xIdx, y2Idx) + m_ptrS->getDistance(y1Idx, zIdx);
-  double xz_y1y2 = m_ptrS->getDistance(xIdx, zIdx) + m_ptrS->getDistance(y1Idx, y2Idx);
+  std::size_t leafIdx1 = m_speciesLeafIdx[x->getSpecies()];
+  std::size_t leafIdx2 = m_speciesLeafIdx[genesY[0]->getSpecies()];
+  std::unordered_set<std::string>& outgroupsS = m_lcaOutgroups[m_lcaS.at(leafIdx1,leafIdx2)];
 
-  // 0: xy1 | y2z
-  if(xy1_y2z < xy2_y1z && xy1_y2z < xz_y1y2){
-    quartet = 0;
-  // 1: xy2 | y1z
-  } else if(xy2_y1z < xy1_y2z && xy2_y1z < xz_y1y2){
-    quartet = 1;
-  // 2: xz | y1y2
-  } else if(xz_y1y2 < xy1_y2z && xz_y1y2 < xy2_y1z){
-    quartet = 2;
-  // 3: star topology
-  } else {
-    quartet = 3;
+  auto result = std::vector<Gene*>();
+  std::size_t i = x->getIndex();
+  std::size_t j = 0;
+  std::size_t N = m_I.getDim();
+
+  while(result.size() < m_outgroupLimit && j < N){
+    Gene* candidateGene = m_ptrS->getGenePtr(m_I.at(i,j));
+    if(outgroupsS.find(candidateGene->getSpecies()) != outgroupsS.end()) {
+      result.push_back(candidateGene);
+    }
+    ++j;
   }
 
-  std::vector<double> sums = {xy1_y2z, xy2_y1z, xz_y1y2};
-  std::sort(sums.begin(), sums.end());
-
-  if(sums[2] > 0){
-    weight = (1 - sums[0]/sums[2]) * std::exp(sums[1]-sums[2]);
-  }
-
-  return std::make_pair(quartet, weight);
+  return result;
 }

@@ -35,7 +35,7 @@ Tree::buildPreorder(std::shared_ptr<TreeNode> node){
 void
 Tree::initPreorderAndIndex(std::shared_ptr<TreeNode> node){
 
-  if(node == m_root){
+  if(node == nullptr){
     m_preorder.clear();
     m_nodeCounter = 0;
     m_leafCounter = 0;
@@ -44,9 +44,11 @@ Tree::initPreorderAndIndex(std::shared_ptr<TreeNode> node){
 
   } else {
     m_preorder.push_back(node);
-    node->m_nodeIdx = m_nodeCounter++;
+    node->m_nodeIdx = m_nodeCounter;
+    ++m_nodeCounter;
     if(!node->hasChildren()){
-      node->m_leafIdx = m_leafCounter++;
+      node->m_leafIdx = m_leafCounter;
+      ++m_leafCounter;
     }
 
     for(auto child : node->getChildren()){

@@ -154,7 +154,7 @@ Scenario::parseSpeciesGenesLine(std::string line){
 }
 
 void
-Scenario::parseSTreeSubtrees(const char* filepath, bool parseNewick){
+Scenario::parseSTreeSubtrees(const char* filepath, bool subtreeFiles){
   std::ifstream filestream(std::string(filepath), std::ios::binary);
 
   if(!filestream) {
@@ -163,7 +163,7 @@ Scenario::parseSTreeSubtrees(const char* filepath, bool parseNewick){
 
   std::string line;
 
-  if(parseNewick){
+  if(!subtreeFiles){
     std::getline(filestream, line);
     parseNewickAndCheck(line);
   } else {
