@@ -140,7 +140,7 @@ std::vector<Gene*>
 BMGBuilder::chooseOutgroups(const std::vector<Gene*>& outgroupCandidates){
   auto outgroups = std::vector<Gene*>();
 
-  size_t limit = std::min(m_outgroupLimit, outgroupCandidates.size());
+  std::size_t limit = std::min(m_outgroupLimit, outgroupCandidates.size());
   std::sample(outgroupCandidates.begin(), outgroupCandidates.end(),
               std::back_inserter(outgroups),
               limit,

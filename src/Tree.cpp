@@ -11,7 +11,7 @@ Tree::addChild(std::shared_ptr<TreeNode> parent, std::shared_ptr<TreeNode> child
     ++m_leafCounter;
   }
   parent->m_children.push_back(std::shared_ptr<TreeNode>(child));
-  child->m_parent = parent->m_children.back();
+  child->m_parent = parent;
 
   m_preorderUpToDate = false;
 }

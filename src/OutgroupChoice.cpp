@@ -73,9 +73,15 @@ OutgroupChoice::computeLcaS(){
   for(auto& v : m_ptrS->getSTree().getPreorder()){
 
     std::size_t vid = v->getNodeIdx();
+    m_nodeIdxToNode[vid] = v->getValue();                           // help map
     m_subtreeSpecies[vid].insert(m_subtreeSpecies[vid].end(),
                                  v->getLeaves().begin(),
                                  v->getLeaves().end());
+    // std::cout << "N" << v->getValue();
+    // for(auto species : m_subtreeSpecies[vid]){
+    //   std::cout << "  " << species->getValue();
+    // }
+    // std::cout << std::endl;
 
     for(auto& leaf : m_subtreeSpecies[vid]){
       auto genes = m_ptrS->getSpeciesGenes(leaf->getValue());
@@ -123,6 +129,15 @@ OutgroupChoice::computeOutgroups(){
       auto& parentsOutgroups = m_lcaOutgroups[v->getParent().lock()->getNodeIdx()];
       m_lcaOutgroups[vid].insert(parentsOutgroups.begin(),
                                  parentsOutgroups.end());
+     // std::cout << "Np---" << v->getValue() << "p" << v->getParent().lock()->getValue();
+     // for(auto species : m_lcaOutgroups[vid]){
+     //   std::cout << "  " << species;
+     // }
+     // std::cout << std::endl;
+    }
+
+    if(v->getChildren().size() == 1){
+      continue;
     }
 
     for(auto& c1 : v->getChildren()){
@@ -134,69 +149,75 @@ OutgroupChoice::computeOutgroups(){
         std::size_t c2id = c2->getNodeIdx();
 
         if(rootDone){
-          auto& genesC1 = m_subtreeGenes[c1id];
-          auto& speciesC2 = m_subtreeSpecies[c2id];
-          auto outgroupCandidates = std::unordered_set<std::shared_ptr<TreeNode>>(speciesC2.begin(),
-                                                                                  speciesC2.end());
-          if((genesC1.size() > 1) && (speciesC2.size() > 1)){
-            for(std::size_t i = 0; i < speciesC2.size()-1; ++i){
-              for(std::size_t j = i; j < speciesC2.size(); ++j){
-                auto genesC2 = std::vector<Gene*>();
-                auto& genesToAppend1 = m_ptrS->getSpeciesGenes(speciesC2[i]->getValue());
-                genesC2.insert(genesC2.end(),
-                               genesToAppend1.begin(),
-                               genesToAppend1.end());
-                auto& genesToAppend2 = m_ptrS->getSpeciesGenes(speciesC2[j]->getValue());
-                genesC2.insert(genesC2.end(),
-                               genesToAppend2.begin(),
-                               genesToAppend2.end());
-
-                std::vector<double> votes {0.0, 0.0};
-//                for(std::size_t k = 0; k < m_outgroupLimit; ++k){
-                for(std::size_t k = 0; k < 20; ++k){
-                  auto a_b = std::vector<Gene*>();
-                  std::sample(genesC1.begin(), genesC1.end(),
-                              std::back_inserter(a_b),
-                              2, std::mt19937{std::random_device{}()});
-                  auto c_d = std::vector<Gene*>();
-                  std::sample(genesC2.begin(), genesC2.end(),
-                              std::back_inserter(c_d),
-                              2, std::mt19937{std::random_device{}()});
-                  if(m_weightedMode){
-                    auto voteAndWeight = m_ptrQ->supportedQuartetWeighted(a_b[0], a_b[1], c_d[0], c_d[1]);
-                    if(voteAndWeight.first == 0){
-                      votes[0] += voteAndWeight.second;
-                    } else {
-                      votes[1] += voteAndWeight.second;
-                    }
-                  } else {
-                    if(m_ptrQ->supportedQuartetMajority(a_b[0], a_b[1], c_d[0], c_d[1]) == 0){
-                      votes[0] += 1.0;
-                    } else {
-                      votes[1] += 1.0;
-                    }
-                  }
-                }
-
-                if(votes[1] / (votes[0]+votes[1]) >= m_incongruentThreshold){
-                  outgroupCandidates.erase(speciesC2[i]);
-                  outgroupCandidates.erase(speciesC2[j]);
-                }
-              }
-            }
-          }
-          for(auto species : outgroupCandidates){
-            m_lcaOutgroups[c1id].insert(species->getValue());
-          }
+//           auto& genesC1 = m_subtreeGenes[c1id];
+//           auto& speciesC2 = m_subtreeSpecies[c2id];
+//           auto outgroupCandidates = std::unordered_set<std::shared_ptr<TreeNode>>(speciesC2.begin(),
+//                                                                                   speciesC2.end());
+//           if((genesC1.size() > 1) && (speciesC2.size() > 1)){
+//             for(std::size_t i = 0; i < speciesC2.size()-1; ++i){
+//               for(std::size_t j = i; j < speciesC2.size(); ++j){
+//                 auto genesC2 = std::vector<Gene*>();
+//                 auto& genesToAppend1 = m_ptrS->getSpeciesGenes(speciesC2[i]->getValue());
+//                 genesC2.insert(genesC2.end(),
+//                                genesToAppend1.begin(),
+//                                genesToAppend1.end());
+//                 auto& genesToAppend2 = m_ptrS->getSpeciesGenes(speciesC2[j]->getValue());
+//                 genesC2.insert(genesC2.end(),
+//                                genesToAppend2.begin(),
+//                                genesToAppend2.end());
+//
+//                 std::vector<double> votes {0.0, 0.0};
+// //                for(std::size_t k = 0; k < m_outgroupLimit; ++k){
+//                 for(std::size_t k = 0; k < 20; ++k){
+//                   auto a_b = std::vector<Gene*>();
+//                   std::sample(genesC1.begin(), genesC1.end(),
+//                               std::back_inserter(a_b),
+//                               2, std::mt19937{std::random_device{}()});
+//                   auto c_d = std::vector<Gene*>();
+//                   std::sample(genesC2.begin(), genesC2.end(),
+//                               std::back_inserter(c_d),
+//                               2, std::mt19937{std::random_device{}()});
+//                   if(m_weightedMode){
+//                     auto voteAndWeight = m_ptrQ->supportedQuartetWeighted(a_b[0], a_b[1], c_d[0], c_d[1]);
+//                     if(voteAndWeight.first == 0){
+//                       votes[0] += voteAndWeight.second;
+//                     } else {
+//                       votes[1] += voteAndWeight.second;
+//                     }
+//                   } else {
+//                     if(m_ptrQ->supportedQuartetMajority(a_b[0], a_b[1], c_d[0], c_d[1]) == 0){
+//                       votes[0] += 1.0;
+//                     } else {
+//                       votes[1] += 1.0;
+//                     }
+//                   }
+//                 }
+//
+//                 if(votes[1] / (votes[0]+votes[1]) >= m_incongruentThreshold){
+//                   outgroupCandidates.erase(speciesC2[i]);
+//                   outgroupCandidates.erase(speciesC2[j]);
+//                 }
+//               }
+//             }
+//           }
+//           for(auto species : outgroupCandidates){
+//             m_lcaOutgroups[c1id].insert(species->getValue());
+//           }
 
         } else {
+          // std::cout << "N---" << v->getValue();
+          // for(auto species : m_subtreeSpecies[c2id]){
+          //   std::cout << "  " << species->getValue();
+          // }
+          // std::cout << std::endl;
           for(auto species : m_subtreeSpecies[c2id]){
             m_lcaOutgroups[c1id].insert(species->getValue());
           }
         }
-        rootDone = true;
+
       }
     }
+    rootDone = true;
   }
 }
 
@@ -219,13 +240,25 @@ OutgroupChoice::getClosest(Gene* x, std::vector<Gene*>& genesY){
   std::size_t j = 0;
   std::size_t N = m_I.getDim();
 
-  while(result.size() < m_outgroupLimit && j < N){
+  // while(result.size() < m_outgroupLimit && j < N){
+  while(j < N){
     Gene* candidateGene = m_ptrS->getGenePtr(m_I.at(i,j));
     if(outgroupsS.find(candidateGene->getSpecies()) != outgroupsS.end()) {
       result.push_back(candidateGene);
     }
     ++j;
   }
+  // std::cout << x->getIdentifier()
+  //           << "  " << m_lcaOutgroups[m_lcaS.at(leafIdx1,leafIdx2)].size()
+  //           << "  " << genesY[0]->getSpecies()
+  //           << "  " << m_nodeIdxToNode[m_lcaS.at(leafIdx1,leafIdx2)]
+  //           << std::endl;
+  // std::cout << result.size() << std::endl;
+  auto result2 = std::vector<Gene*>();
+  std::sample(result.begin(), result.end(),
+              std::back_inserter(result2),
+              std::min(m_outgroupLimit, result.size()),
+              std::mt19937{std::random_device{}()});
 
-  return result;
+  return result2;
 }

@@ -39,9 +39,10 @@ private:
   Matrix<std::size_t> m_lcaS;
 
   std::unordered_map<std::string, std::size_t> m_speciesLeafIdx;
+  std::unordered_map<std::size_t, std::string> m_nodeIdxToNode;
   std::vector<std::vector<std::shared_ptr<TreeNode>>> m_subtreeSpecies;
   std::vector<std::vector<Gene*>> m_subtreeGenes;
-  std::unordered_map<int, std::unordered_set<std::string>> m_lcaOutgroups;
+  std::unordered_map<std::size_t, std::unordered_set<std::string>> m_lcaOutgroups;
 
   void quicksortRow(std::size_t row, int l, int r);
   void buildIMatrix();
