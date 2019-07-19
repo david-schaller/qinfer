@@ -1,6 +1,8 @@
 #include <algorithm>
 #include <random>
 
+#include <iostream>
+
 #include "OutgroupChoice.h"
 
 void
@@ -48,6 +50,14 @@ OutgroupChoice::buildIMatrix(){
   for(std::size_t row = 0; row < dim; ++row){
     quicksortRow(row, 0, dim-1);
   }
+
+  // // test output of the matrix
+  // for(std::size_t i = 0; i < dim; ++i){
+  //   for(std::size_t j = 0; j < dim; ++j){
+  //       std::cout << m_I.at(i,j) << "  ";
+  //   }
+  //   std::cout << std::endl;
+  // }
 }
 
 void
@@ -110,7 +120,7 @@ OutgroupChoice::computeOutgroups(){
   for(auto& v : m_ptrS->getSTree().getPreorder()){
     std::size_t vid = v->getNodeIdx();
     if(v->hasParent()){
-      auto parentsOutgroups = m_lcaOutgroups[v->getParent().lock()->getNodeIdx()];
+      auto& parentsOutgroups = m_lcaOutgroups[v->getParent().lock()->getNodeIdx()];
       m_lcaOutgroups[vid].insert(parentsOutgroups.begin(),
                                  parentsOutgroups.end());
     }
@@ -132,12 +142,14 @@ OutgroupChoice::computeOutgroups(){
             for(std::size_t i = 0; i < speciesC2.size()-1; ++i){
               for(std::size_t j = i; j < speciesC2.size(); ++j){
                 auto genesC2 = std::vector<Gene*>();
+                auto& genesToAppend1 = m_ptrS->getSpeciesGenes(speciesC2[i]->getValue());
                 genesC2.insert(genesC2.end(),
-                      m_ptrS->getSpeciesGenes(speciesC2[i]->getValue()).begin(),
-                      m_ptrS->getSpeciesGenes(speciesC2[i]->getValue()).end());
+                               genesToAppend1.begin(),
+                               genesToAppend1.end());
+                auto& genesToAppend2 = m_ptrS->getSpeciesGenes(speciesC2[j]->getValue());
                 genesC2.insert(genesC2.end(),
-                      m_ptrS->getSpeciesGenes(speciesC2[j]->getValue()).begin(),
-                      m_ptrS->getSpeciesGenes(speciesC2[j]->getValue()).end());
+                               genesToAppend2.begin(),
+                               genesToAppend2.end());
 
                 std::vector<double> votes {0.0, 0.0};
 //                for(std::size_t k = 0; k < m_outgroupLimit; ++k){
