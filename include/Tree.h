@@ -13,11 +13,20 @@ public:
     , m_nodeIdx(-1)
     , m_leafIdx(-1) { };
 
-  std::string getValue() const { return m_value; };
-  size_t getNodeIdx() const { return m_nodeIdx; };
-  size_t getLeafIdx() const { return m_leafIdx; };
-  bool hasParent() const { return !m_parent.expired(); };
-  bool hasChildren() const { return !m_children.empty(); };
+  std::string
+  getValue() const { return m_value; };
+
+  size_t
+  getNodeIdx() const { return m_nodeIdx; };
+
+  size_t
+  getLeafIdx() const { return m_leafIdx; };
+
+  bool
+  hasParent() const { return !m_parent.expired(); };
+
+  bool
+  hasChildren() const { return !m_children.empty(); };
 
   const std::vector<std::shared_ptr<TreeNode>>&
   getChildren() const { return m_children; };
@@ -48,23 +57,36 @@ public:
     , m_nodeCounter(0)
     , m_leafCounter(0)
     , m_preorderUpToDate(false) { };
+
   Tree(std::shared_ptr<TreeNode> root)
     : m_root(root)
     , m_nodeCounter(0)
     , m_leafCounter(0)
     , m_preorderUpToDate(false) { };
 
-  size_t getNodeNumber() const { return m_nodeCounter; };
-  size_t getLeafNumber() const { return m_leafCounter; };
+  size_t
+  getNodeNumber() const { return m_nodeCounter; };
 
-  void addChild(std::shared_ptr<TreeNode> parent, std::shared_ptr<TreeNode> child);
-  void supplyLeaves(std::shared_ptr<TreeNode> node = nullptr);
-  const std::vector<std::shared_ptr<TreeNode>>& getPreorder();
+  size_t
+  getLeafNumber() const { return m_leafCounter; };
 
-  std::string toNewick() const;
-  static Tree parseNewick(std::string newick);
+  void
+  addChild(std::shared_ptr<TreeNode> parent, std::shared_ptr<TreeNode> child);
 
-  std::vector<std::vector<std::string>> speciesInSubtrees() const;
+  void
+  supplyLeaves(std::shared_ptr<TreeNode> node = nullptr);
+
+  const std::vector<std::shared_ptr<TreeNode>>&
+  getPreorder();
+
+  std::string
+  toNewick() const;
+
+  static Tree
+  parseNewick(std::string newick);
+
+  std::vector<std::vector<std::string>>
+  speciesInSubtrees() const;
 
 private:
   std::shared_ptr<TreeNode> m_root;
@@ -73,18 +95,23 @@ private:
   size_t m_leafCounter;
   bool m_preorderUpToDate;
 
-  void buildPreorder(std::shared_ptr<TreeNode> node = nullptr);
-  void initPreorderAndIndex(std::shared_ptr<TreeNode> node = nullptr);
+  void
+  buildPreorder(std::shared_ptr<TreeNode> node = nullptr);
 
-  std::string constructNewick(std::shared_ptr<TreeNode> node) const;
+  void
+  initPreorderAndIndex(std::shared_ptr<TreeNode> node = nullptr);
 
-  static void parseSubtree(Tree& tree,
-                           std::shared_ptr<TreeNode> subRoot,
-                           std::string subtreeString);
-  static std::vector<std::string> splitChildren(std::string childString);
+  std::string
+  constructNewick(std::shared_ptr<TreeNode> node) const;
 
-  void fillSubtreeVector(std::shared_ptr<TreeNode> node,
-                         std::vector<std::string>& subtree) const;
+  static void
+  parseSubtree(Tree& tree, std::shared_ptr<TreeNode> subRoot, std::string subtreeString);
+
+  static std::vector<std::string>
+  splitChildren(std::string childString);
+
+  void
+  fillSubtreeVector(std::shared_ptr<TreeNode> node, std::vector<std::string>& subtree) const;
 };
 
 #endif /* TREE_H */

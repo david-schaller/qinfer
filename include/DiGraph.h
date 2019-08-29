@@ -16,15 +16,17 @@ public:
   void addNode(T v);
   void addEdge(T u, T v);
 
-  std::vector<std::set<T>> stronglyConnectedComponents() const;
-  std::vector<T> getSccWithoutOutedges() const;
-  const std::unordered_map<T, std::vector<T>>& getAdjacency() const {
-    return m_adjList;
-  };
+  std::vector<std::set<T>>
+  stronglyConnectedComponents() const;
 
-  const std::vector<T>& getNeighbors(T u) const {
-    return m_adjList.at(u);
-  };
+  std::vector<T>
+  getSccWithoutOutedges() const;
+
+  const std::unordered_map<T, std::vector<T>>&
+  getAdjacency() const { return m_adjList; };
+
+  const std::vector<T>&
+  getNeighbors(T u) const { return m_adjList.at(u); };
 
 private:
   std::unordered_map<T, std::vector<T>> m_adjList;

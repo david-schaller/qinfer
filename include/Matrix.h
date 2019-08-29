@@ -6,12 +6,19 @@
 template<typename T>
 class Matrix {
 public:
-  void initMatrix(size_t dim, T value);
-  size_t getDim() const { return m_dim; };
+  void
+  initMatrix(size_t dim, T value);
 
-  T& at(size_t row, size_t col);
+  size_t
+  getDim() const { return m_dim; };
+
+  T&
+  at(size_t row, size_t col);
+
   // for const best match distance matrices
-  const T& at(size_t row, size_t col) const;
+  const T&
+  at(size_t row, size_t col) const;
+  
 private:
   size_t m_dim;
   std::vector<std::vector<T>> m_matrix;

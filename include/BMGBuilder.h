@@ -49,15 +49,22 @@ private:
   DiGraph<Gene*> m_bmg;
 
   // COMMON FUNCTIONS
-  void epsilonMethod();
-  void buildCandidateMatrix();
+  void
+  epsilonMethod();
+
+  void
+  buildCandidateMatrix();
 
   // OUTGROUP METHOD I
-  std::vector<Gene*> chooseOutgroups(const std::vector<Gene*>& outgroupCandidates);
-  void buildRootOutgroups();
+  std::vector<Gene*>
+  chooseOutgroups(const std::vector<Gene*>& outgroupCandidates);
+
+  void
+  buildRootOutgroups();
 
   // OUTGROUP METHOD II
-  void buildRelativeOutgroups();
+  void
+  buildRelativeOutgroups();
 };
 
 #endif /* BMGBUILDER_H */

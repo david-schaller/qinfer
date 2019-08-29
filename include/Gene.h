@@ -9,13 +9,23 @@ public:
     : m_identifier(identifier)
     , m_idx (idx) { };
 
-  std::string getIdentifier() const { return m_identifier; };
-  const std::string& getSpecies() const { return m_species; };
-  size_t getIndex() const { return m_idx; };
-  size_t getSubtree() const { return m_subtreeIdx; };
+  std::string
+  getIdentifier() const { return m_identifier; };
 
-  void setSpecies(std::string species) { m_species = species; }
-  void setSubtree(size_t subtree) { m_subtreeIdx = subtree; }
+  const std::string&
+  getSpecies() const { return m_species; };
+
+  size_t
+  getIndex() const { return m_idx; };
+
+  size_t
+  getSubtree() const { return m_subtreeIdx; };
+
+  void
+  setSpecies(std::string species) { m_species = species; }
+
+  void
+  setSubtree(size_t subtree) { m_subtreeIdx = subtree; }
 
   bool operator==(const Gene &otherGene) const
     {
