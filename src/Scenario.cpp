@@ -182,7 +182,9 @@ Scenario::parseSTreeSubtrees(const char* filepath, bool subtreeFiles){
   // check if all species with genes are in the subtree lists
   checkSpeciesAvailability();
   // build the corresponding lists of outgroup genes
+  if(m_benchmark) m_benchmark->startOutgroupInit();
   buildOutgroupInfo();
+  if(m_benchmark) m_benchmark->endOutgroupInit();
 }
 
 void

@@ -9,9 +9,18 @@
 #include "Gene.h"
 #include "Matrix.h"
 #include "Tree.h"
+#include "Benchmark.h"
 
 class Scenario {
 public:
+  Scenario(Benchmark* bm = nullptr)
+  : m_genes()
+  , m_distanceMatrix()
+  , m_geneAssignments()
+  , m_speciesGenes()
+  , m_STree()
+  , m_benchmark(bm) { };
+
   void addGenes(std::deque<Gene>& g);
 
   void parseDistanceMatrix(const char* filepath);
@@ -36,8 +45,11 @@ public:
   Tree&
   getSTree() { return m_STree; };
 
-  const std::vector<Gene*>& getOutgroups(Gene* genePtr) const;
-  const std::vector<std::string>& getSpeciesSubtree(size_t subtreeIdx) const;
+  const std::vector<Gene*>&
+  getOutgroups(Gene* genePtr) const;
+
+  const std::vector<std::string>&
+  getSpeciesSubtree(size_t subtreeIdx) const;
 
 private:
   std::deque<Gene> m_genes;
@@ -45,6 +57,7 @@ private:
   std::unordered_map<std::string, Gene*> m_geneAssignments;
   std::unordered_map<std::string, std::vector<Gene*>> m_speciesGenes;
   Tree m_STree;
+  Benchmark* m_benchmark;
 
   // list of lists of species identifiers belonging to the same m_STreeSubtree
   // of the species tree root and corresponding outgroup genes

@@ -223,9 +223,14 @@ OutgroupChoice::computeOutgroups(){
 
 void
 OutgroupChoice::initialize(){
+  if(m_benchmark) m_benchmark->startSortDistances();
   buildIMatrix();
+  if(m_benchmark) m_benchmark->endSortDistances();
+
+  if(m_benchmark) m_benchmark->startOutgroupInit();
   computeLcaS();
   computeOutgroups();
+  if(m_benchmark) m_benchmark->endOutgroupInit();
 }
 
 std::vector<Gene*>

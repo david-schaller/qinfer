@@ -10,6 +10,7 @@
 #include "Matrix.h"
 #include "Quartets.h"
 #include "OutgroupChoice.h"
+#include "Benchmark.h"
 
 class BMGBuilder {
 public:
@@ -19,7 +20,8 @@ public:
              bool weightedMode = false,
              bool disableQuartet = false,
              bool relativeOutgroups = false,
-             double incongruentThreshold = 0.2)
+             double incongruentThreshold = 0.2,
+             Benchmark* bm = nullptr)
    : m_ptrS(ptrS)
    , m_outgroupLimit(outgroupLimit)
    , m_restrictY(restrictY)
@@ -30,7 +32,9 @@ public:
    , m_outgroupChoice (OutgroupChoice(ptrS, &m_quartets,
                                       outgroupLimit,
                                       weightedMode,
-                                      incongruentThreshold)) { };
+                                      incongruentThreshold,
+                                      bm))
+   , m_benchmark(bm) { };
 
   void buildBMG();
   void printBMG();
@@ -44,6 +48,7 @@ private:
   bool m_relativeOutgroups;
   Quartets m_quartets;
   OutgroupChoice m_outgroupChoice;
+  Benchmark* m_benchmark;
 
   Matrix<int> m_bmCandidates;
   DiGraph<Gene*> m_bmg;

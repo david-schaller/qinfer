@@ -4,9 +4,11 @@
 #include <stdexcept>
 #include <regex>
 #include <map>
+#include <fstream>
 
 #include "Scenario.h"
 #include "BMGBuilder.h"
+#include "Benchmark.h"
 
 namespace fs = std::filesystem;
 
@@ -30,6 +32,8 @@ main(int argc, char* argv[]) -> int
   bool subtreeFiles = false;
   bool relativeOutgroups = false;
   double incongruentThreshold = 0.2;
+  bool benchmark = false;
+  std::string benchmarkFile = "benchmark.txt";
 
   std::map<std::string, std::pair<bool*, double*>> param = {
 
@@ -46,7 +50,10 @@ main(int argc, char* argv[]) -> int
       { "-subtree-files",   {&subtreeFiles, nullptr} },
 
       { "a",                {&relativeOutgroups, &incongruentThreshold} },
-      { "-all-outgroups",   {&relativeOutgroups, &incongruentThreshold} }
+      { "-all-outgroups",   {&relativeOutgroups, &incongruentThreshold} },
+
+      { "b",                {&benchmark, nullptr} },
+      { "-benchmark",       {&benchmark, nullptr} }
   };
 
   for(size_t i = 3; i < (size_t)argc; ++i) {
@@ -59,20 +66,26 @@ main(int argc, char* argv[]) -> int
     std::string arg2(argv[i]);
 
     if(std::regex_search(arg1, matches1, rgx1)) {
-      if(param.find(matches1[1].str()) != param.end()){
+      if(param.find(matches1[1].str()) != param.end()) {
         *param[matches1[1].str()].first = true;
-        if(param[matches1[1].str()].second != nullptr){
+
+        if(param[matches1[1].str()].second != nullptr) {
           *param[matches1[1].str()].second = std::stod(matches1[2].str());
+
+        } else if(matches1[1].str() == "b" || matches1[1].str() == "-benchmark") {
+          benchmarkFile = matches1[2].str();
         }
       } else if(i > 3) {
         throw std::runtime_error("Illegal parameter: " + matches1[1].str());
       }
+
     } else if(std::regex_search(arg2, matches2, rgx2))  {
       if(param.find(matches2[1].str()) != param.end()){
         *param[matches2[1].str()].first = true;
       } else if(i > 3) {
         throw std::runtime_error("Illegal parameter: " + matches2[1].str());
       }
+
     } else if(i > 3) {
       throw std::runtime_error("Illegal parameter format");
     }
@@ -88,7 +101,7 @@ main(int argc, char* argv[]) -> int
   if(incongruentThreshold < 0.0){ incongruentThreshold = 0.0; }
   else if(incongruentThreshold > 1.0){ incongruentThreshold = 1.0; }
 
-  // Check if files exist
+  // check if files exist
   const size_t fileCount = (disableQuartet) ? 2 : 3;
   auto fileError = false;
   for(size_t i = 1; i < fileCount + 1; ++i) {
@@ -105,20 +118,31 @@ main(int argc, char* argv[]) -> int
 
   if(fileError) return -2;
 
+  Benchmark bm;
+
+  // read the input files and check integrity
+  if(benchmark) bm.startReadFiles();
   auto s = Scenario();
   s.parseDistanceMatrix(argv[1]);
   s.parseSpeciesGenes(argv[2]);
   if(!disableQuartet){
     s.parseSTreeSubtrees(argv[3], subtreeFiles);
   }
+  if(benchmark) bm.endReadFiles();
 
+  // initialize intance of BMGBuilder
   size_t outgroupLimit = 10;
   auto bmgBuilder = BMGBuilder(&s, outgroupLimit, restrictY, epsilon,
                                weightedMode, disableQuartet, relativeOutgroups,
-                               incongruentThreshold);
-
+                               incongruentThreshold, benchmark ? &bm : nullptr);
   bmgBuilder.buildBMG();
   bmgBuilder.printBMG();
+
+  // write benchmarking results into file
+  if(benchmark){
+    std::ofstream ostrm(benchmarkFile, std::ios::app);
+    bm.flush(ostrm);
+  }
 
   return 0;
 }

@@ -18,21 +18,30 @@ BMGBuilder::buildBMG(){
 
   // use the simple epsilon method if m_disableQuartet is true
   if(m_disableQuartet){
+    if(m_benchmark) m_benchmark->startEpsilon();
     epsilonMethod();
+    if(m_benchmark) m_benchmark->endEpsilon();
     return;
   }
+  if(m_benchmark) m_benchmark->startEpsilon();
 
   // build a matrix to check whether y is a best match candidate for x
   if(m_restrictY){
+    if(m_benchmark) m_benchmark->startEpsilon();
     buildCandidateMatrix();
+    if(m_benchmark) m_benchmark->endEpsilon();
   }
 
   // main algorithms
   if(!m_relativeOutgroups){
+    if(m_benchmark) m_benchmark->startBuildBMG();
     buildRootOutgroups();
+    if(m_benchmark) m_benchmark->endBuildBMG();
   } else {
     m_outgroupChoice.initialize();
+    if(m_benchmark) m_benchmark->startBuildBMG();
     buildRelativeOutgroups();
+    if(m_benchmark) m_benchmark->endBuildBMG();
   }
 
 }
@@ -157,7 +166,10 @@ BMGBuilder::buildRootOutgroups(){
 
   for(Gene& x : m_ptrS->getGenes()){
     const std::vector<Gene*>& outgroupCandidates = m_ptrS->getOutgroups(&x);
+
+    if(m_benchmark) m_benchmark->startChooseOutgroups();
     std::vector<Gene*> outgroupsZ = chooseOutgroups(outgroupCandidates);
+    if(m_benchmark) m_benchmark->endChooseOutgroups();
 
     for(const std::string& speciesY : m_ptrS->getSpeciesSubtree(x.getSubtree())){
 
@@ -242,7 +254,9 @@ BMGBuilder::buildRelativeOutgroups(){
 
       } else {
         // find best matches in gene set Y
+        if(m_benchmark) m_benchmark->startChooseOutgroups();
         std::vector<Gene*> outgroupsZ = m_outgroupChoice.getClosest(&x, genesY);
+        if(m_benchmark) m_benchmark->endChooseOutgroups();
         for(Gene* bm : m_quartets.findBestMatches(&x, genesY, outgroupsZ)){
           m_bmg.addEdge(&x, bm);
         }
