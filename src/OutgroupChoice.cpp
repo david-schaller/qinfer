@@ -6,7 +6,7 @@
 #include "OutgroupChoice.h"
 
 void
-OutgroupChoice::quicksortRow(std::size_t row, int l, int r){
+OutgroupChoice::quicksortRow(size_t row, int l, int r){
   if(r <= l){
     return;
   }
@@ -24,7 +24,7 @@ OutgroupChoice::quicksortRow(std::size_t row, int l, int r){
     }
 
     if(i <= j){
-      std::size_t temp = m_I.at(row, i);
+      size_t temp = m_I.at(row, i);
       m_I.at(row, i) = m_I.at(row, j);
       m_I.at(row, j) = temp;
       ++i;
@@ -38,22 +38,22 @@ OutgroupChoice::quicksortRow(std::size_t row, int l, int r){
 
 void
 OutgroupChoice::buildIMatrix(){
-  std::size_t dim {m_ptrS->getGenes().size()};
+  size_t dim {m_ptrS->getGenes().size()};
   m_I.initMatrix(dim, 0);
 
-  for(std::size_t j = 1; j < dim; ++j){
-    for(std::size_t i = 0; i < dim; ++i){
+  for(size_t j = 1; j < dim; ++j){
+    for(size_t i = 0; i < dim; ++i){
       m_I.at(i,j) = j;
     }
   }
 
-  for(std::size_t row = 0; row < dim; ++row){
+  for(size_t row = 0; row < dim; ++row){
     quicksortRow(row, 0, dim-1);
   }
 
   // // test output of the matrix
-  // for(std::size_t i = 0; i < dim; ++i){
-  //   for(std::size_t j = 0; j < dim; ++j){
+  // for(size_t i = 0; i < dim; ++i){
+  //   for(size_t j = 0; j < dim; ++j){
   //       std::cout << m_I.at(i,j) << "  ";
   //   }
   //   std::cout << std::endl;
@@ -63,8 +63,8 @@ OutgroupChoice::buildIMatrix(){
 void
 OutgroupChoice::computeLcaS(){
   m_ptrS->getSTree().supplyLeaves();
-  std::size_t nodeN = m_ptrS->getSTree().getNodeNumber();
-  std::size_t leafN = m_ptrS->getSTree().getLeafNumber();
+  size_t nodeN = m_ptrS->getSTree().getNodeNumber();
+  size_t leafN = m_ptrS->getSTree().getLeafNumber();
 
   m_lcaS.initMatrix(leafN, 0);
   m_subtreeSpecies = std::vector<std::vector<std::shared_ptr<TreeNode>>>(nodeN, std::vector<std::shared_ptr<TreeNode>>());
@@ -72,7 +72,7 @@ OutgroupChoice::computeLcaS(){
 
   for(auto& v : m_ptrS->getSTree().getPreorder()){
 
-    std::size_t vid = v->getNodeIdx();
+    size_t vid = v->getNodeIdx();
     // m_nodeIdxToNode[vid] = v->getValue();                           // help map
     m_subtreeSpecies[vid].insert(m_subtreeSpecies[vid].end(),
                                  v->getLeaves().begin(),
@@ -97,8 +97,8 @@ OutgroupChoice::computeLcaS(){
 
     } else if (children.size() >= 2){
       // for all combinations of 2 children of v
-      for(std::size_t i = 0; i < children.size()-1; ++i){
-        for(std::size_t j = i; j < children.size(); ++j){
+      for(size_t i = 0; i < children.size()-1; ++i){
+        for(size_t j = i; j < children.size(); ++j){
 
           // for all combinations of 2 genes from the respective species
           for(auto& l1 : children[i]->getLeaves()){
@@ -116,7 +116,7 @@ OutgroupChoice::computeLcaS(){
 void
 OutgroupChoice::computeOutgroups(){
 
-  for(std::size_t i = 0; i < m_subtreeSpecies.size(); ++i){
+  for(size_t i = 0; i < m_subtreeSpecies.size(); ++i){
     m_lcaOutgroups[i] = std::unordered_set<std::string>();
   }
 
@@ -124,7 +124,7 @@ OutgroupChoice::computeOutgroups(){
   bool rootDone = false;
 
   for(auto& v : m_ptrS->getSTree().getPreorder()){
-    std::size_t vid = v->getNodeIdx();
+    size_t vid = v->getNodeIdx();
     if(v->hasParent()){
       auto& parentsOutgroups = m_lcaOutgroups[v->getParent().lock()->getNodeIdx()];
       m_lcaOutgroups[vid].insert(parentsOutgroups.begin(),
@@ -141,12 +141,12 @@ OutgroupChoice::computeOutgroups(){
     }
 
     for(auto& c1 : v->getChildren()){
-      std::size_t c1id = c1->getNodeIdx();
+      size_t c1id = c1->getNodeIdx();
       for(auto& c2 : v->getChildren()){
         if(c1 == c2){
           continue;
         }
-        std::size_t c2id = c2->getNodeIdx();
+        size_t c2id = c2->getNodeIdx();
 
         if(rootDone){
           auto& genesC1 = m_subtreeGenes[c1id];
@@ -154,8 +154,8 @@ OutgroupChoice::computeOutgroups(){
           auto outgroupCandidates = std::unordered_set<std::shared_ptr<TreeNode>>(speciesC2.begin(),
                                                                                   speciesC2.end());
           if((genesC1.size() > 1) && (speciesC2.size() > 1)){
-            for(std::size_t i = 0; i < speciesC2.size()-1; ++i){
-              for(std::size_t j = i; j < speciesC2.size(); ++j){
+            for(size_t i = 0; i < speciesC2.size()-1; ++i){
+              for(size_t j = i; j < speciesC2.size(); ++j){
                 auto genesC2 = std::vector<Gene*>();
                 auto& genesToAppend1 = m_ptrS->getSpeciesGenes(speciesC2[i]->getValue());
                 genesC2.insert(genesC2.end(),
@@ -167,8 +167,8 @@ OutgroupChoice::computeOutgroups(){
                                genesToAppend2.end());
 
                 std::vector<double> votes {0.0, 0.0};
-//                for(std::size_t k = 0; k < m_outgroupLimit; ++k){
-                for(std::size_t k = 0; k < 20; ++k){
+//                for(size_t k = 0; k < m_outgroupLimit; ++k){
+                for(size_t k = 0; k < 20; ++k){
                   auto a_b = std::vector<Gene*>();
                   std::sample(genesC1.begin(), genesC1.end(),
                               std::back_inserter(a_b),
@@ -231,14 +231,14 @@ OutgroupChoice::initialize(){
 std::vector<Gene*>
 OutgroupChoice::getClosest(Gene* x, std::vector<Gene*>& genesY){
 
-  std::size_t leafIdx1 = m_speciesLeafIdx[x->getSpecies()];
-  std::size_t leafIdx2 = m_speciesLeafIdx[genesY[0]->getSpecies()];
+  size_t leafIdx1 = m_speciesLeafIdx[x->getSpecies()];
+  size_t leafIdx2 = m_speciesLeafIdx[genesY[0]->getSpecies()];
   std::unordered_set<std::string>& outgroupsS = m_lcaOutgroups[m_lcaS.at(leafIdx1,leafIdx2)];
 
   auto result = std::vector<Gene*>();
-  std::size_t i = x->getIndex();
-  std::size_t j = 0;
-  std::size_t N = m_I.getDim();
+  size_t i = x->getIndex();
+  size_t j = 0;
+  size_t N = m_I.getDim();
 
   while(result.size() < m_outgroupLimit && j < N){
   //while(j < N){

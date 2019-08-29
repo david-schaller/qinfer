@@ -21,7 +21,7 @@ Scenario::getOutgroups(Gene* genePtr) const {
 }
 
 const std::vector<std::string>&
-Scenario::getSpeciesSubtree(std::size_t subtreeIdx) const {
+Scenario::getSpeciesSubtree(size_t subtreeIdx) const {
   return m_STreeSubtrees[subtreeIdx];
 }
 
@@ -45,7 +45,7 @@ Scenario::parseDistanceMatrix(const char* filepath){
     throw std::runtime_error("Failed to open file " + std::string(filepath));
   }
 
-  std::size_t lineCounter = 0;
+  size_t lineCounter = 0;
   std::string line;
   while(std::getline(filestream, line)) {
     // read the first line which contains the dimension
@@ -61,8 +61,8 @@ Scenario::parseDistanceMatrix(const char* filepath){
   rebuildMap();
 
   // // test output of the matrix
-  // for(std::size_t i = 0; i < m_distanceMatrix.getDim(); ++i){
-  //   for(std::size_t j = 0; j < m_distanceMatrix.getDim(); ++j){
+  // for(size_t i = 0; i < m_distanceMatrix.getDim(); ++i){
+  //   for(size_t j = 0; j < m_distanceMatrix.getDim(); ++j){
   //       std::cout << m_distanceMatrix.at(i,j) << "  ";
   //   }
   //   std::cout << std::endl;
@@ -70,11 +70,11 @@ Scenario::parseDistanceMatrix(const char* filepath){
 }
 
 void
-Scenario::parseDistanceMatrixRow(std::string row, std::size_t rowIdx){
+Scenario::parseDistanceMatrixRow(std::string row, size_t rowIdx){
 
   const std::string delimiter = "\t";
 
-  std::size_t columnIdx = 0;
+  size_t columnIdx = 0;
   size_t pos = 0;
   std::string token;
   while ((pos = row.find(delimiter)) != std::string::npos) {
@@ -118,7 +118,7 @@ Scenario::parseSpeciesGenesLine(std::string line){
   const std::string delimiter = "\t";
 
   bool firstElement = true;
-  std::size_t pos = 0;
+  size_t pos = 0;
   std::string token;
 
   while ((pos = line.find(delimiter)) != std::string::npos) {
@@ -209,7 +209,7 @@ Scenario::parseSTreeSubtreeLine(std::string line){
   m_STreeSubtrees.push_back(std::vector<std::string>());
 
   const std::string delimiter = "\t";
-  std::size_t pos = 0;
+  size_t pos = 0;
   std::string token;
 
   while ((pos = line.find(delimiter)) != std::string::npos) {
@@ -257,9 +257,9 @@ Scenario::checkSpeciesAvailability(){
 
 void
 Scenario::buildOutgroupInfo(){
-  for(std::size_t i = 0; i < m_STreeSubtrees.size(); ++i){
+  for(size_t i = 0; i < m_STreeSubtrees.size(); ++i){
     m_outgroups.push_back(std::vector<Gene*>());
-    for(std::size_t j = 0; j < m_STreeSubtrees.size(); ++j){
+    for(size_t j = 0; j < m_STreeSubtrees.size(); ++j){
       if(i != j){
         for(auto species : m_STreeSubtrees[j]){
           m_outgroups.back().insert(m_outgroups.back().end(),

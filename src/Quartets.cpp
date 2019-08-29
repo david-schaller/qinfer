@@ -9,9 +9,9 @@ Quartets::findBestMatches(const Gene* x,
                           const std::vector<Gene*>& outgroupsZ){
   auto gamma = DiGraph<Gene*>();
 
-  for(std::size_t i = 0; i < genesY.size(); ++i){
+  for(size_t i = 0; i < genesY.size(); ++i){
     Gene* y1 = genesY[i];
-    for(std::size_t j = i+1; j < genesY.size(); ++j){
+    for(size_t j = i+1; j < genesY.size(); ++j){
       Gene* y2 = genesY[j];
 
       std::vector<double> votes = {0.0, 0.0, 0.0, 0.0};
@@ -47,14 +47,14 @@ Quartets::findBestMatches(const Gene* x,
   return gamma.getSccWithoutOutedges();
 }
 
-std::size_t
+size_t
 Quartets::supportedQuartetMajority(const Gene* x, const Gene* y1,
                                    const Gene* y2, const Gene* z){
-  std::size_t xIdx = x->getIndex();
-  std::size_t y1Idx = y1->getIndex();
-  std::size_t y2Idx = y2->getIndex();
-  std::size_t zIdx = z->getIndex();
-  std::size_t quartet;
+  size_t xIdx = x->getIndex();
+  size_t y1Idx = y1->getIndex();
+  size_t y2Idx = y2->getIndex();
+  size_t zIdx = z->getIndex();
+  size_t quartet;
 
   double xy1_y2z = m_ptrS->getDistance(xIdx, y1Idx) + m_ptrS->getDistance(y2Idx, zIdx);
   double xy2_y1z = m_ptrS->getDistance(xIdx, y2Idx) + m_ptrS->getDistance(y1Idx, zIdx);
@@ -77,14 +77,14 @@ Quartets::supportedQuartetMajority(const Gene* x, const Gene* y1,
   return quartet;
 }
 
-std::pair<std::size_t,double>
+std::pair<size_t,double>
 Quartets::supportedQuartetWeighted(const Gene* x, const Gene* y1,
                                    const Gene* y2, const Gene* z){
-  std::size_t xIdx = x->getIndex();
-  std::size_t y1Idx = y1->getIndex();
-  std::size_t y2Idx = y2->getIndex();
-  std::size_t zIdx = z->getIndex();
-  std::size_t quartet;
+  size_t xIdx = x->getIndex();
+  size_t y1Idx = y1->getIndex();
+  size_t y2Idx = y2->getIndex();
+  size_t zIdx = z->getIndex();
+  size_t quartet;
   double weight = 0.0;
 
   double xy1_y2z = m_ptrS->getDistance(xIdx, y1Idx) + m_ptrS->getDistance(y2Idx, zIdx);

@@ -14,8 +14,8 @@ public:
     , m_leafIdx(-1) { };
 
   inline std::string getValue() const { return m_value; };
-  inline std::size_t getNodeIdx() const { return m_nodeIdx; };
-  inline std::size_t getLeafIdx() const { return m_leafIdx; };
+  inline size_t getNodeIdx() const { return m_nodeIdx; };
+  inline size_t getLeafIdx() const { return m_leafIdx; };
   inline bool hasParent() const { return !m_parent.expired(); };
   inline bool hasChildren() const { return !m_children.empty(); };
   inline const std::vector<std::shared_ptr<TreeNode>>& getChildren() const {
@@ -33,8 +33,8 @@ public:
 
 private:
   std::string m_value;
-  std::size_t m_nodeIdx;
-  std::size_t m_leafIdx;
+  size_t m_nodeIdx;
+  size_t m_leafIdx;
   std::vector<std::shared_ptr<TreeNode>> m_children;
   std::weak_ptr<TreeNode> m_parent;
   std::vector<std::shared_ptr<TreeNode>> m_leaves;
@@ -54,8 +54,8 @@ public:
     , m_leafCounter(0)
     , m_preorderUpToDate(false) { };
 
-  inline std::size_t getNodeNumber() const { return m_nodeCounter; };
-  inline std::size_t getLeafNumber() const { return m_leafCounter; };
+  inline size_t getNodeNumber() const { return m_nodeCounter; };
+  inline size_t getLeafNumber() const { return m_leafCounter; };
 
   void addChild(std::shared_ptr<TreeNode> parent, std::shared_ptr<TreeNode> child);
   void supplyLeaves(std::shared_ptr<TreeNode> node = nullptr);
@@ -69,8 +69,8 @@ public:
 private:
   std::shared_ptr<TreeNode> m_root;
   std::vector<std::shared_ptr<TreeNode>> m_preorder;
-  std::size_t m_nodeCounter;
-  std::size_t m_leafCounter;
+  size_t m_nodeCounter;
+  size_t m_leafCounter;
   bool m_preorderUpToDate;
 
   void buildPreorder(std::shared_ptr<TreeNode> node = nullptr);

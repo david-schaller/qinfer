@@ -14,7 +14,7 @@
 class BMGBuilder {
 public:
   BMGBuilder(Scenario* ptrS,
-             std::size_t outgroupLimit,
+             size_t outgroupLimit,
              bool restrictY, double epsilon = 0.5,
              bool weightedMode = false,
              bool disableQuartet = false,
@@ -37,7 +37,7 @@ public:
 
 private:
   Scenario* m_ptrS;
-  std::size_t m_outgroupLimit;
+  size_t m_outgroupLimit;
   bool m_restrictY;
   float m_epsilon;
   bool m_disableQuartet;

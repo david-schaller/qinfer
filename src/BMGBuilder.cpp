@@ -53,15 +53,15 @@ BMGBuilder::printBMG(){
 
 void
 BMGBuilder::buildCandidateMatrix(){
-  std::size_t dim {m_ptrS->getGenes().size()};
+  size_t dim {m_ptrS->getGenes().size()};
   m_bmCandidates.initMatrix(dim, 0);
   double threshold = 1.0 + m_epsilon;
 
-  for(std::size_t i = 0; i < dim; ++i){
+  for(size_t i = 0; i < dim; ++i){
     auto speciesMap = std::unordered_map<std::string, double>();
     const auto& species_i = m_ptrS->getGeneSpecies(i);
 
-    for(std::size_t j = 0; j < dim; ++j){
+    for(size_t j = 0; j < dim; ++j){
       const auto& species_j = m_ptrS->getGeneSpecies(j);
       if(species_i != species_j){
         if(speciesMap.find(species_j) == speciesMap.end()){
@@ -76,7 +76,7 @@ BMGBuilder::buildCandidateMatrix(){
       }
     }
 
-    for(std::size_t j = 0; j < dim; ++j){
+    for(size_t j = 0; j < dim; ++j){
       const auto& species_j = m_ptrS->getGeneSpecies(j);
       if( (species_i != species_j) &&
           (m_ptrS->getDistance(i, j) <= threshold * speciesMap.at(species_j))){
@@ -86,8 +86,8 @@ BMGBuilder::buildCandidateMatrix(){
   }
 
   // // test output of the matrix
-  // for(std::size_t i = 0; i < dim; ++i){
-  //   for(std::size_t j = 0; j < dim; ++j){
+  // for(size_t i = 0; i < dim; ++i){
+  //   for(size_t j = 0; j < dim; ++j){
   //       std::cout << m_bmCandidates.at(i,j) << "  ";
   //   }
   //   std::cout << std::endl;
@@ -99,14 +99,14 @@ BMGBuilder::buildCandidateMatrix(){
 ******************************************************************************/
 void
 BMGBuilder::epsilonMethod(){
-  std::size_t dim {m_ptrS->getGenes().size()};
+  size_t dim {m_ptrS->getGenes().size()};
   double threshold = 1.0 + m_epsilon;
 
-  for(std::size_t i = 0; i < dim; ++i){
+  for(size_t i = 0; i < dim; ++i){
     auto speciesMap = std::unordered_map<std::string, double>();
     const auto& species_i = m_ptrS->getGeneSpecies(i);
 
-    for(std::size_t j = 0; j < dim; ++j){
+    for(size_t j = 0; j < dim; ++j){
       const auto& species_j = m_ptrS->getGeneSpecies(j);
       if(species_i != species_j){
         if(speciesMap.find(species_j) == speciesMap.end()){
@@ -121,7 +121,7 @@ BMGBuilder::epsilonMethod(){
       }
     }
 
-    for(std::size_t j = 0; j < dim; ++j){
+    for(size_t j = 0; j < dim; ++j){
       const auto& species_j = m_ptrS->getGeneSpecies(j);
       if( (species_i != species_j) &&
           (m_ptrS->getDistance(i, j) <= threshold * speciesMap.at(species_j))){
@@ -140,7 +140,7 @@ std::vector<Gene*>
 BMGBuilder::chooseOutgroups(const std::vector<Gene*>& outgroupCandidates){
   auto outgroups = std::vector<Gene*>();
 
-  std::size_t limit = std::min(m_outgroupLimit, outgroupCandidates.size());
+  size_t limit = std::min(m_outgroupLimit, outgroupCandidates.size());
   std::sample(outgroupCandidates.begin(), outgroupCandidates.end(),
               std::back_inserter(outgroups),
               limit,

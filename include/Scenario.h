@@ -22,17 +22,17 @@ public:
     return m_genes[i].getSpecies();
   };
   inline std::deque<Gene>& getGenes() { return m_genes; };
-  inline Gene* getGenePtr(std::size_t idx) { return &(m_genes[idx]); }
+  inline Gene* getGenePtr(size_t idx) { return &(m_genes[idx]); }
   inline const std::vector<Gene*>& getSpeciesGenes(std::string species) const {
     return m_speciesGenes.at(species);
   };
-  inline const double& getDistance(std::size_t row, std::size_t column) const {
+  inline const double& getDistance(size_t row, size_t column) const {
     return m_distanceMatrix.at(row, column);
   };
   inline Tree& getSTree() { return m_STree; };
 
   const std::vector<Gene*>& getOutgroups(Gene* genePtr) const;
-  const std::vector<std::string>& getSpeciesSubtree(std::size_t subtreeIdx) const;
+  const std::vector<std::string>& getSpeciesSubtree(size_t subtreeIdx) const;
 
 private:
   std::deque<Gene> m_genes;
@@ -47,7 +47,7 @@ private:
   std::vector<std::vector<Gene*>> m_outgroups;
 
   void rebuildMap();
-  void parseDistanceMatrixRow(std::string row, std::size_t rowIdx);
+  void parseDistanceMatrixRow(std::string row, size_t rowIdx);
   void parseSpeciesGenesLine(std::string line);
   void parseNewickAndCheck(std::string line);
   void parseSTreeSubtreeLine(std::string line);

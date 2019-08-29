@@ -137,7 +137,7 @@ Tree::parseSubtree(Tree& tree,
     auto node = std::make_shared<TreeNode>(std::string(""));
     tree.addChild(subRoot, node);
 
-    std::size_t subtreeEnd = std::string::npos;
+    size_t subtreeEnd = std::string::npos;
     if(child.size() > 1 && child.at(0) == '('){
       subtreeEnd = child.rfind(')');
       if(subtreeEnd == std::string::npos){

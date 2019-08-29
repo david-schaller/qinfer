@@ -2,6 +2,8 @@
 #include <filesystem>
 #include <string>
 #include <stdexcept>
+#include <regex>
+#include <map>
 
 #include "Scenario.h"
 #include "BMGBuilder.h"
@@ -29,53 +31,50 @@ main(int argc, char* argv[]) -> int
   bool relativeOutgroups = false;
   double incongruentThreshold = 0.2;
 
-  int pos = 3;
-  while (pos < argc) {
+  std::map<std::string, std::pair<bool*, double*>> param = {
 
-    if((std::string(argv[pos]) == "-d") ||
-       (std::string(argv[pos]) == "--disable-quartet")){
-      disableQuartet = true;
-      ++pos;
-    } else if((std::string(argv[pos]) == "-w") ||
-       (std::string(argv[pos]) == "--weighted")){
-      weightedMode = true;
-      ++pos;
+      { "e",                {&restrictY, &epsilon} },
+      { "-epsilon",         {&restrictY, &epsilon} },
 
-    // use subtree files instead of newick species tree
-    } else if((std::string(argv[pos]) == "-s") ||
-              (std::string(argv[pos]) == "--subtree-files")){
-      subtreeFiles = true;
-      ++pos;
+      { "d",                {&disableQuartet, nullptr} },
+      { "-disable-quartet", {&disableQuartet, nullptr} },
 
-    // use all (also relative) outgroups in the species tree
-    } else if((std::string(argv[pos]) == "-a") ||
-              (std::string(argv[pos]) == "--all-outgroups")){
-      relativeOutgroups = true;
-      ++pos;
-      if(pos < argc){
-        try {
-          incongruentThreshold = std::stod(std::string(argv[pos]));
-          ++pos;
-        } catch (const std::invalid_argument&) {
-          // restore default value
-          incongruentThreshold = 0.2;
+      { "w",                {&weightedMode, nullptr} },
+      { "-weighted",        {&weightedMode, nullptr} },
+
+      { "s",                {&subtreeFiles, nullptr} },
+      { "-subtree-files",   {&subtreeFiles, nullptr} },
+
+      { "a",                {&relativeOutgroups, &incongruentThreshold} },
+      { "-all-outgroups",   {&relativeOutgroups, &incongruentThreshold} }
+  };
+
+  for(size_t i = 3; i < (size_t)argc; ++i) {
+
+    std::regex rgx1("-([A-Za-z0-9-]*)=([0-9]*\\.?[0-9]*)");
+    std::smatch matches1;
+    std::string arg1(argv[i]);
+    std::regex rgx2("-([A-Za-z0-9-]*)");
+    std::smatch matches2;
+    std::string arg2(argv[i]);
+
+    if(std::regex_search(arg1, matches1, rgx1)) {
+      if(param.find(matches1[1].str()) != param.end()){
+        *param[matches1[1].str()].first = true;
+        if(param[matches1[1].str()].second != nullptr){
+          *param[matches1[1].str()].second = std::stod(matches1[2].str());
         }
+      } else if(i > 3) {
+        throw std::runtime_error("Illegal parameter: " + matches1[1].str());
       }
-
-    } else if((std::string(argv[pos]) == "-e") ||
-              (std::string(argv[pos]) == "--epsilon")){
-      if(pos+1 < argc){
-        restrictY = true;
-        epsilon = std::stod(std::string(argv[pos+1]));
-        pos += 2;
-      } else {
-        std::cerr << "Missing epsilon value for '-e' option!"
-                  << std::endl;
-        return -3;
+    } else if(std::regex_search(arg2, matches2, rgx2))  {
+      if(param.find(matches2[1].str()) != param.end()){
+        *param[matches2[1].str()].first = true;
+      } else if(i > 3) {
+        throw std::runtime_error("Illegal parameter: " + matches2[1].str());
       }
-
-    } else {
-      ++pos;
+    } else if(i > 3) {
+      throw std::runtime_error("Illegal parameter format");
     }
   }
 
@@ -90,9 +89,9 @@ main(int argc, char* argv[]) -> int
   else if(incongruentThreshold > 1.0){ incongruentThreshold = 1.0; }
 
   // Check if files exist
-  const std::size_t fileCount = (disableQuartet) ? 2 : 3;
+  const size_t fileCount = (disableQuartet) ? 2 : 3;
   auto fileError = false;
-  for(std::size_t i = 1; i < fileCount + 1; ++i) {
+  for(size_t i = 1; i < fileCount + 1; ++i) {
     const fs::path filepath(argv[i]);
 
     if(!fs::exists(filepath) || !fs::is_regular_file(filepath)) {
@@ -113,7 +112,7 @@ main(int argc, char* argv[]) -> int
     s.parseSTreeSubtrees(argv[3], subtreeFiles);
   }
 
-  std::size_t outgroupLimit = 10;
+  size_t outgroupLimit = 10;
   auto bmgBuilder = BMGBuilder(&s, outgroupLimit, restrictY, epsilon,
                                weightedMode, disableQuartet, relativeOutgroups,
                                incongruentThreshold);
