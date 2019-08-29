@@ -25,8 +25,11 @@ public:
     , m_weightedMode(weightedMode)
     , m_incongruentThreshold(incongruentThreshold) { };
 
-  void initialize();
-  std::vector<Gene*> getClosest(Gene* x, std::vector<Gene*>& genesY);
+  void
+  initialize();
+
+  std::vector<Gene*>
+  getClosest(Gene* x, std::vector<Gene*>& genesY);
 
 private:
   Scenario* m_ptrS;
