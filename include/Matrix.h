@@ -7,7 +7,7 @@ template<typename T>
 class Matrix {
 public:
   void initMatrix(size_t dim, T value);
-  inline size_t getDim() const { return m_dim; };
+  size_t getDim() const { return m_dim; };
 
   T& at(size_t row, size_t col);
   // for const best match distance matrices

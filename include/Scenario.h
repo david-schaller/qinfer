@@ -18,18 +18,23 @@ public:
   void parseSpeciesGenes(const char* filepath);
   void parseSTreeSubtrees(const char* filepath, bool subtreeFiles);
 
-  inline const std::string& getGeneSpecies(int i) const {
-    return m_genes[i].getSpecies();
-  };
-  inline std::deque<Gene>& getGenes() { return m_genes; };
-  inline Gene* getGenePtr(size_t idx) { return &(m_genes[idx]); }
-  inline const std::vector<Gene*>& getSpeciesGenes(std::string species) const {
-    return m_speciesGenes.at(species);
-  };
-  inline const double& getDistance(size_t row, size_t column) const {
-    return m_distanceMatrix.at(row, column);
-  };
-  inline Tree& getSTree() { return m_STree; };
+  const std::string&
+  getGeneSpecies(int i) const { return m_genes[i].getSpecies();};
+
+  std::deque<Gene>&
+  getGenes() { return m_genes; };
+
+  Gene*
+  getGenePtr(size_t idx) { return &(m_genes[idx]); }
+
+  const std::vector<Gene*>&
+  getSpeciesGenes(std::string species) const { return m_speciesGenes.at(species); };
+
+  const double&
+  getDistance(size_t row, size_t column) const { return m_distanceMatrix.at(row, column); };
+
+  Tree&
+  getSTree() { return m_STree; };
 
   const std::vector<Gene*>& getOutgroups(Gene* genePtr) const;
   const std::vector<std::string>& getSpeciesSubtree(size_t subtreeIdx) const;

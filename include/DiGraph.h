@@ -22,7 +22,7 @@ public:
     return m_adjList;
   };
 
-  inline const std::vector<T>& getNeighbors(T u) const {
+  const std::vector<T>& getNeighbors(T u) const {
     return m_adjList.at(u);
   };
 

@@ -13,23 +13,23 @@ public:
     , m_nodeIdx(-1)
     , m_leafIdx(-1) { };
 
-  inline std::string getValue() const { return m_value; };
-  inline size_t getNodeIdx() const { return m_nodeIdx; };
-  inline size_t getLeafIdx() const { return m_leafIdx; };
-  inline bool hasParent() const { return !m_parent.expired(); };
-  inline bool hasChildren() const { return !m_children.empty(); };
-  inline const std::vector<std::shared_ptr<TreeNode>>& getChildren() const {
-    return m_children;
-  };
-  inline const std::vector<std::shared_ptr<TreeNode>>& getLeaves() const {
-    return m_leaves;
-  };
-  inline const std::weak_ptr<TreeNode>& getParent() const {
-    return m_parent;
-  };
+  std::string getValue() const { return m_value; };
+  size_t getNodeIdx() const { return m_nodeIdx; };
+  size_t getLeafIdx() const { return m_leafIdx; };
+  bool hasParent() const { return !m_parent.expired(); };
+  bool hasChildren() const { return !m_children.empty(); };
 
-  std::shared_ptr<TreeNode> addChild(std::string value,
-                                     std::shared_ptr<TreeNode> parent);
+  const std::vector<std::shared_ptr<TreeNode>>&
+  getChildren() const { return m_children; };
+
+  const std::vector<std::shared_ptr<TreeNode>>&
+  getLeaves() const { return m_leaves; };
+
+  const std::weak_ptr<TreeNode>&
+  getParent() const { return m_parent; };
+
+  std::shared_ptr<TreeNode>
+  addChild(std::string value, std::shared_ptr<TreeNode> parent);
 
 private:
   std::string m_value;
@@ -54,8 +54,8 @@ public:
     , m_leafCounter(0)
     , m_preorderUpToDate(false) { };
 
-  inline size_t getNodeNumber() const { return m_nodeCounter; };
-  inline size_t getLeafNumber() const { return m_leafCounter; };
+  size_t getNodeNumber() const { return m_nodeCounter; };
+  size_t getLeafNumber() const { return m_leafCounter; };
 
   void addChild(std::shared_ptr<TreeNode> parent, std::shared_ptr<TreeNode> child);
   void supplyLeaves(std::shared_ptr<TreeNode> node = nullptr);
