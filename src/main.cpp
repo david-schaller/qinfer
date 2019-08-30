@@ -58,32 +58,37 @@ main(int argc, char* argv[]) -> int
 
   for(size_t i = 3; i < (size_t)argc; ++i) {
 
+    std::string arg(argv[i]);
     std::regex rgx1("-([A-Za-z0-9-]*)=([0-9]*\\.?[0-9]*)");
     std::smatch matches1;
-    std::string arg1(argv[i]);
-    std::regex rgx2("-([A-Za-z0-9-]*)");
+    std::regex rgx2("(-b|--benchmark)=([A-Za-z0-9-_\\.]*)");
     std::smatch matches2;
-    std::string arg2(argv[i]);
+    std::regex rgx3("-([A-Za-z0-9-]*)");
+    std::smatch matches3;
 
-    if(std::regex_search(arg1, matches1, rgx1)) {
+    // benchmarking file
+    if(std::regex_search(arg, matches2, rgx2))  {
+      benchmark = true;
+      benchmarkFile = matches2[2].str();
+
+    // parameters with double values
+    } else if(std::regex_search(arg, matches1, rgx1)) {
       if(param.find(matches1[1].str()) != param.end()) {
         *param[matches1[1].str()].first = true;
 
         if(param[matches1[1].str()].second != nullptr) {
           *param[matches1[1].str()].second = std::stod(matches1[2].str());
-
-        } else if(matches1[1].str() == "b" || matches1[1].str() == "-benchmark") {
-          benchmarkFile = matches1[2].str();
         }
       } else if(i > 3) {
         throw std::runtime_error("Illegal parameter: " + matches1[1].str());
       }
 
-    } else if(std::regex_search(arg2, matches2, rgx2))  {
-      if(param.find(matches2[1].str()) != param.end()){
-        *param[matches2[1].str()].first = true;
+    // parameters without double values or use of default values
+    } else if(std::regex_search(arg, matches3, rgx3))  {
+      if(param.find(matches3[1].str()) != param.end()){
+        *param[matches3[1].str()].first = true;
       } else if(i > 3) {
-        throw std::runtime_error("Illegal parameter: " + matches2[1].str());
+        throw std::runtime_error("Illegal parameter: " + matches3[1].str());
       }
 
     } else if(i > 3) {
@@ -118,11 +123,12 @@ main(int argc, char* argv[]) -> int
 
   if(fileError) return -2;
 
-  Benchmark bm;
+  Benchmark bm(disableQuartet, restrictY, weightedMode, subtreeFiles, relativeOutgroups,
+               epsilon, incongruentThreshold);
 
   // read the input files and check integrity
   if(benchmark) bm.startReadFiles();
-  auto s = Scenario();
+  auto s = Scenario(benchmark ? &bm : nullptr);
   s.parseDistanceMatrix(argv[1]);
   s.parseSpeciesGenes(argv[2]);
   if(!disableQuartet){
@@ -140,6 +146,7 @@ main(int argc, char* argv[]) -> int
 
   // write benchmarking results into file
   if(benchmark){
+    bm.endTotal();
     std::ofstream ostrm(benchmarkFile, std::ios::app);
     bm.flush(ostrm);
   }

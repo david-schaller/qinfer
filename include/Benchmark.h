@@ -6,8 +6,16 @@
 
 class Benchmark {
 public:
-  Benchmark()
-   : m_initTime(std::chrono::high_resolution_clock::now())
+  Benchmark(bool disableQuartet, bool restrictY, bool weightedMode, bool subtreeFiles, bool relativeOutgroups,
+            double epsilon, double incongruentThreshold)
+   : m_disableQuartet(disableQuartet)
+   , m_restrictY(restrictY)
+   , m_weightedMode(weightedMode)
+   , m_subtreeFiles(subtreeFiles)
+   , m_relativeOutgroups(relativeOutgroups)
+   , m_epsilon(epsilon)
+   , m_incongruentThreshold(incongruentThreshold)
+   , m_initTime(std::chrono::high_resolution_clock::now())
    , m_readFilesStart()
    , m_sortDistancesStart()
    , m_epsilonStart()
@@ -33,7 +41,7 @@ public:
      m_outgroupInitDuration = m_readFilesStart - m_readFilesStart;
      m_buildBMGDuration = m_readFilesStart - m_readFilesStart;
      m_chooseOutrgroupsDuration = m_readFilesStart - m_readFilesStart;
-
+     m_totalDuration = m_readFilesStart - m_readFilesStart;
     };
 
   void startReadFiles() { m_readFilesStart = std::chrono::high_resolution_clock::now(); };
@@ -54,9 +62,14 @@ public:
   void startChooseOutgroups() { m_chooseOutrgroupsStart = std::chrono::high_resolution_clock::now(); };
   void endChooseOutgroups() { m_chooseOutrgroupsDuration += std::chrono::high_resolution_clock::now() - m_chooseOutrgroupsStart; };
 
+  void endTotal() { m_totalDuration += std::chrono::high_resolution_clock::now() - m_initTime; };
+
   void flush(std::basic_ofstream<char>& stream);
 
 private:
+  bool m_disableQuartet, m_restrictY, m_weightedMode, m_subtreeFiles, m_relativeOutgroups;
+  double m_epsilon, m_incongruentThreshold;
+
   std::chrono::time_point<std::chrono::high_resolution_clock> m_initTime;
 
   std::chrono::time_point<std::chrono::high_resolution_clock> m_readFilesStart,
@@ -71,7 +84,8 @@ private:
                                 m_epsilonDuration,
                                 m_outgroupInitDuration,
                                 m_buildBMGDuration,
-                                m_chooseOutrgroupsDuration;
+                                m_chooseOutrgroupsDuration,
+                                m_totalDuration;
 };
 
 #endif /* BENCHMARK_H */
