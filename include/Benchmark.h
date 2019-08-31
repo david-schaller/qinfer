@@ -15,6 +15,7 @@ public:
    , m_relativeOutgroups(relativeOutgroups)
    , m_epsilon(epsilon)
    , m_incongruentThreshold(incongruentThreshold)
+   , m_geneNumber(0)
    , m_initTime(std::chrono::high_resolution_clock::now())
    , m_readFilesStart()
    , m_sortDistancesStart()
@@ -44,6 +45,8 @@ public:
      m_totalDuration = m_readFilesStart - m_readFilesStart;
     };
 
+  void setGeneNumber(size_t geneNumber) { m_geneNumber = geneNumber; };
+
   void startReadFiles() { m_readFilesStart = std::chrono::high_resolution_clock::now(); };
   void endReadFiles() { m_readFilesDuration = std::chrono::high_resolution_clock::now() - m_readFilesStart; };
 
@@ -69,6 +72,7 @@ public:
 private:
   bool m_disableQuartet, m_restrictY, m_weightedMode, m_subtreeFiles, m_relativeOutgroups;
   double m_epsilon, m_incongruentThreshold;
+  size_t m_geneNumber;
 
   std::chrono::time_point<std::chrono::high_resolution_clock> m_initTime;
 

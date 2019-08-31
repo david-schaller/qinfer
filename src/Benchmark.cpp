@@ -13,6 +13,7 @@ Benchmark::flush(std::basic_ofstream<char>& stream) {
            << std::chrono::duration_cast<std::chrono::nanoseconds>(m_buildBMGDuration).count() << ","
            << std::chrono::duration_cast<std::chrono::nanoseconds>(m_chooseOutrgroupsDuration).count() << ","
            << std::chrono::duration_cast<std::chrono::nanoseconds>(m_totalDuration).count() << ","
+           << m_geneNumber << ","
            << (m_disableQuartet ? 1 : 0) << ","
            << (m_restrictY ? 1 : 0) << ","
            << (m_weightedMode ? 1 : 0) << ","
