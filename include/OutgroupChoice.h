@@ -12,20 +12,17 @@
 #include "Matrix.h"
 #include "Tree.h"
 #include "Quartets.h"
+#include "Parameters.h"
 #include "Benchmark.h"
 
 class OutgroupChoice {
 public:
   OutgroupChoice(Scenario* ptrS, Quartets* ptrQ,
-                 size_t outgroupLimit,
-                 bool weightedMode = false,
-                 double incongruentThreshold = 0.2,
+                 Parameters* ptrParam,
                  Benchmark* bm = nullptr)
     : m_ptrS(ptrS)
     , m_ptrQ(ptrQ)
-    , m_outgroupLimit(outgroupLimit)
-    , m_weightedMode(weightedMode)
-    , m_incongruentThreshold(incongruentThreshold)
+    , m_ptrParam(ptrParam)
     , m_benchmark(bm) { };
 
   void
@@ -37,9 +34,7 @@ public:
 private:
   Scenario* m_ptrS;
   Quartets* m_ptrQ;
-  size_t m_outgroupLimit;
-  bool m_weightedMode;
-  double m_incongruentThreshold;
+  Parameters* m_ptrParam;
   Benchmark* m_benchmark;
 
   Matrix<size_t> m_I;

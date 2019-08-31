@@ -38,11 +38,20 @@ Scenario::rebuildMap()
 }
 
 void
-Scenario::parseDistanceMatrix(const char* filepath){
-  std::ifstream filestream(std::string(filepath), std::ios::binary);
+Scenario::parseFiles(){
+  parseDistanceMatrix(m_ptrParam->getMatrixFilename());
+  parseSpeciesGenes(m_ptrParam->getSpeciesFilename());
+  if(!m_ptrParam->quartetsDisabled()){
+    parseSTreeSubtrees(m_ptrParam->getTreeFilename(), m_ptrParam->subtreeFiles());
+  }
+}
+
+void
+Scenario::parseDistanceMatrix(std::string filepath){
+  std::ifstream filestream(filepath, std::ios::binary);
 
   if(!filestream) {
-    throw std::runtime_error("Failed to open file " + std::string(filepath));
+    throw std::runtime_error("Failed to open file " + filepath);
   }
 
   size_t lineCounter = 0;
@@ -96,11 +105,11 @@ Scenario::parseDistanceMatrixRow(std::string row, size_t rowIdx){
 }
 
 void
-Scenario::parseSpeciesGenes(const char* filepath){
-  std::ifstream filestream(std::string(filepath), std::ios::binary);
+Scenario::parseSpeciesGenes(std::string filepath){
+  std::ifstream filestream(filepath, std::ios::binary);
 
   if(!filestream) {
-    throw std::runtime_error("Failed to open file " + std::string(filepath));
+    throw std::runtime_error("Failed to open file " + filepath);
   }
 
   auto v = std::vector<std::vector<double>>();
@@ -155,11 +164,11 @@ Scenario::parseSpeciesGenesLine(std::string line){
 }
 
 void
-Scenario::parseSTreeSubtrees(const char* filepath, bool subtreeFiles){
-  std::ifstream filestream(std::string(filepath), std::ios::binary);
+Scenario::parseSTreeSubtrees(std::string filepath, bool subtreeFiles){
+  std::ifstream filestream(filepath, std::ios::binary);
 
   if(!filestream) {
-    throw std::runtime_error("Failed to open file " + std::string(filepath));
+    throw std::runtime_error("Failed to open file " + filepath);
   }
 
   std::string line;

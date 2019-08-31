@@ -167,7 +167,7 @@ OutgroupChoice::computeOutgroups(){
                                genesToAppend2.end());
 
                 std::vector<double> votes {0.0, 0.0};
-//                for(size_t k = 0; k < m_outgroupLimit; ++k){
+//                for(size_t k = 0; k < m_ptrParam->getOutgroupLimit(); ++k){
                 for(size_t k = 0; k < 20; ++k){
                   auto a_b = std::vector<Gene*>();
                   std::sample(genesC1.begin(), genesC1.end(),
@@ -177,7 +177,7 @@ OutgroupChoice::computeOutgroups(){
                   std::sample(genesC2.begin(), genesC2.end(),
                               std::back_inserter(c_d),
                               2, std::mt19937{std::random_device{}()});
-                  if(m_weightedMode){
+                  if(m_ptrParam->weightedMode()){
                     auto voteAndWeight = m_ptrQ->supportedQuartetWeighted(a_b[0], a_b[1], c_d[0], c_d[1]);
                     if(voteAndWeight.first == 0){
                       votes[0] += voteAndWeight.second;
@@ -193,7 +193,7 @@ OutgroupChoice::computeOutgroups(){
                   }
                 }
 
-                if(votes[1] / (votes[0]+votes[1]) >= m_incongruentThreshold){
+                if(votes[1] / (votes[0]+votes[1]) >= m_ptrParam->getIncongruenceThreshold()){
                   outgroupCandidates.erase(speciesC2[i]);
                   outgroupCandidates.erase(speciesC2[j]);
                 }
@@ -244,8 +244,9 @@ OutgroupChoice::getClosest(Gene* x, std::vector<Gene*>& genesY){
   size_t i = x->getIndex();
   size_t j = 0;
   size_t N = m_I.getDim();
+  size_t limit = m_ptrParam->getOutgroupLimit();
 
-  while(result.size() < m_outgroupLimit && j < N){
+  while(result.size() < limit  && j < N){
   //while(j < N){
     Gene* candidateGene = m_ptrS->getGenePtr(m_I.at(i,j));
     if(outgroupsS.find(candidateGene->getSpecies()) != outgroupsS.end()) {
@@ -262,7 +263,7 @@ OutgroupChoice::getClosest(Gene* x, std::vector<Gene*>& genesY){
   // auto result2 = std::vector<Gene*>();
   // std::sample(result.begin(), result.end(),
   //             std::back_inserter(result2),
-  //             std::min(m_outgroupLimit, result.size()),
+  //             std::min(m_ptrParam->getOutgroupLimit(), result.size()),
   //             std::mt19937{std::random_device{}()});
   //
   // return result2;

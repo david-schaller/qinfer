@@ -17,7 +17,7 @@ Quartets::findBestMatches(const Gene* x,
       std::vector<double> votes = {0.0, 0.0, 0.0, 0.0};
 
       for(const Gene* z : outgroupsZ){
-        if(m_weightedMode){
+        if(m_ptrParam->weightedMode()){
           auto voteAndWeight = supportedQuartetWeighted(x, y1, y2, z);
           votes[voteAndWeight.first] += voteAndWeight.second;
         } else {

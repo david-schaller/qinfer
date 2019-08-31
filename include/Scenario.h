@@ -9,12 +9,14 @@
 #include "Gene.h"
 #include "Matrix.h"
 #include "Tree.h"
+#include "Parameters.h"
 #include "Benchmark.h"
 
 class Scenario {
 public:
-  Scenario(Benchmark* bm = nullptr)
-  : m_genes()
+  Scenario(Parameters* ptrParam, Benchmark* bm = nullptr)
+  : m_ptrParam(ptrParam)
+  , m_genes()
   , m_distanceMatrix()
   , m_geneAssignments()
   , m_speciesGenes()
@@ -23,9 +25,7 @@ public:
 
   void addGenes(std::deque<Gene>& g);
 
-  void parseDistanceMatrix(const char* filepath);
-  void parseSpeciesGenes(const char* filepath);
-  void parseSTreeSubtrees(const char* filepath, bool subtreeFiles);
+  void parseFiles();
 
   const std::string&
   getGeneSpecies(int i) const { return m_genes[i].getSpecies();};
@@ -52,6 +52,7 @@ public:
   getSpeciesSubtree(size_t subtreeIdx) const;
 
 private:
+  Parameters* m_ptrParam;
   std::deque<Gene> m_genes;
   Matrix<double> m_distanceMatrix;
   std::unordered_map<std::string, Gene*> m_geneAssignments;
@@ -63,6 +64,10 @@ private:
   // of the species tree root and corresponding outgroup genes
   std::vector<std::vector<std::string>> m_STreeSubtrees;
   std::vector<std::vector<Gene*>> m_outgroups;
+
+  void parseDistanceMatrix(std::string filepath);
+  void parseSpeciesGenes(std::string filepath);
+  void parseSTreeSubtrees(std::string filepath, bool subtreeFiles);
 
   void rebuildMap();
   void parseDistanceMatrixRow(std::string row, size_t rowIdx);

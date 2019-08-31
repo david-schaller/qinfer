@@ -16,8 +16,8 @@ BMGBuilder::buildBMG(){
     m_bmg.addNode(&gene);
   }
 
-  // use the simple epsilon method if m_disableQuartet is true
-  if(m_disableQuartet){
+  // use the simple epsilon method if quartets are disabled
+  if(m_ptrParam->quartetsDisabled()){
     if(m_benchmark) m_benchmark->startEpsilon();
     epsilonMethod();
     if(m_benchmark) m_benchmark->endEpsilon();
@@ -26,14 +26,14 @@ BMGBuilder::buildBMG(){
   if(m_benchmark) m_benchmark->startEpsilon();
 
   // build a matrix to check whether y is a best match candidate for x
-  if(m_restrictY){
+  if(m_ptrParam->restrictedY()){
     if(m_benchmark) m_benchmark->startEpsilon();
     buildCandidateMatrix();
     if(m_benchmark) m_benchmark->endEpsilon();
   }
 
   // main algorithms
-  if(!m_relativeOutgroups){
+  if(!m_ptrParam->relativeOutgroups()){
     if(m_benchmark) m_benchmark->startBuildBMG();
     buildRootOutgroups();
     if(m_benchmark) m_benchmark->endBuildBMG();
@@ -64,7 +64,7 @@ void
 BMGBuilder::buildCandidateMatrix(){
   size_t dim {m_ptrS->getGenes().size()};
   m_bmCandidates.initMatrix(dim, 0);
-  double threshold = 1.0 + m_epsilon;
+  double threshold = 1.0 + m_ptrParam->getEpsilon();
 
   for(size_t i = 0; i < dim; ++i){
     auto speciesMap = std::unordered_map<std::string, double>();
@@ -104,12 +104,12 @@ BMGBuilder::buildCandidateMatrix(){
 }
 
 /******************************************************************************
-                                epsilon method
+                          Extended Best Hits method
 ******************************************************************************/
 void
 BMGBuilder::epsilonMethod(){
   size_t dim {m_ptrS->getGenes().size()};
-  double threshold = 1.0 + m_epsilon;
+  double threshold = 1.0 + m_ptrParam->getEpsilon();
 
   for(size_t i = 0; i < dim; ++i){
     auto speciesMap = std::unordered_map<std::string, double>();
@@ -149,7 +149,7 @@ std::vector<Gene*>
 BMGBuilder::chooseOutgroups(const std::vector<Gene*>& outgroupCandidates){
   auto outgroups = std::vector<Gene*>();
 
-  size_t limit = std::min(m_outgroupLimit, outgroupCandidates.size());
+  size_t limit = std::min(m_ptrParam->getOutgroupLimit(), outgroupCandidates.size());
   std::sample(outgroupCandidates.begin(), outgroupCandidates.end(),
               std::back_inserter(outgroups),
               limit,
@@ -181,7 +181,7 @@ BMGBuilder::buildRootOutgroups(){
       // build the gene set Y
       const std::vector<Gene*>& allGenesY = m_ptrS->getSpeciesGenes(speciesY);
       std::vector<Gene*> genesY;
-      if(!m_restrictY){
+      if(!m_ptrParam->restrictedY()){
         genesY = std::vector<Gene*>(allGenesY);
       } else {
         genesY = std::vector<Gene*>();
@@ -232,7 +232,7 @@ BMGBuilder::buildRelativeOutgroups(){
       // build the gene set Y
       const std::vector<Gene*>& allGenesY = m_ptrS->getSpeciesGenes(speciesY);
       std::vector<Gene*> genesY;
-      if(!m_restrictY){
+      if(!m_ptrParam->restrictedY()){
         genesY = std::vector<Gene*>(allGenesY);
       } else {
         genesY = std::vector<Gene*>();

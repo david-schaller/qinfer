@@ -4,17 +4,12 @@
 #include <chrono>
 #include <iosfwd>
 
+#include "Parameters.h"
+
 class Benchmark {
 public:
-  Benchmark(bool disableQuartet, bool restrictY, bool weightedMode, bool subtreeFiles, bool relativeOutgroups,
-            double epsilon, double incongruentThreshold)
-   : m_disableQuartet(disableQuartet)
-   , m_restrictY(restrictY)
-   , m_weightedMode(weightedMode)
-   , m_subtreeFiles(subtreeFiles)
-   , m_relativeOutgroups(relativeOutgroups)
-   , m_epsilon(epsilon)
-   , m_incongruentThreshold(incongruentThreshold)
+  Benchmark(Parameters* ptrParam)
+   : m_ptrParam(ptrParam)
    , m_geneNumber(0)
    , m_initTime(std::chrono::high_resolution_clock::now())
    , m_readFilesStart()
@@ -62,6 +57,7 @@ public:
   void startBuildBMG() { m_buildBMGStart = std::chrono::high_resolution_clock::now(); };
   void endBuildBMG() { m_buildBMGDuration = std::chrono::high_resolution_clock::now() - m_buildBMGStart; };
 
+  // functions for choosing outgroups are called multiple times, the time is cumulated
   void startChooseOutgroups() { m_chooseOutrgroupsStart = std::chrono::high_resolution_clock::now(); };
   void endChooseOutgroups() { m_chooseOutrgroupsDuration += std::chrono::high_resolution_clock::now() - m_chooseOutrgroupsStart; };
 
@@ -70,8 +66,7 @@ public:
   void flush(std::basic_ofstream<char>& stream);
 
 private:
-  bool m_disableQuartet, m_restrictY, m_weightedMode, m_subtreeFiles, m_relativeOutgroups;
-  double m_epsilon, m_incongruentThreshold;
+  Parameters* m_ptrParam;
   size_t m_geneNumber;
 
   std::chrono::time_point<std::chrono::high_resolution_clock> m_initTime;

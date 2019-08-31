@@ -14,13 +14,14 @@ Benchmark::flush(std::basic_ofstream<char>& stream) {
            << std::chrono::duration_cast<std::chrono::nanoseconds>(m_chooseOutrgroupsDuration).count() << ","
            << std::chrono::duration_cast<std::chrono::nanoseconds>(m_totalDuration).count() << ","
            << m_geneNumber << ","
-           << (m_disableQuartet ? 1 : 0) << ","
-           << (m_restrictY ? 1 : 0) << ","
-           << (m_weightedMode ? 1 : 0) << ","
-           << (m_subtreeFiles ? 1 : 0) << ","
-           << (m_relativeOutgroups ? 1 : 0) << ","
-           << m_epsilon << ","
-           << m_incongruentThreshold
+           << (m_ptrParam->quartetsDisabled() ? 1 : 0) << ","
+           << (m_ptrParam->restrictedY() ? 1 : 0) << ","
+           << (m_ptrParam->weightedMode() ? 1 : 0) << ","
+           << (m_ptrParam->subtreeFiles() ? 1 : 0) << ","
+           << (m_ptrParam->relativeOutgroups() ? 1 : 0) << ","
+           << m_ptrParam->getOutgroupLimit() << ","
+           << m_ptrParam->getEpsilon() << ","
+           << m_ptrParam->getIncongruenceThreshold()
            << "\n";
   }
 }
