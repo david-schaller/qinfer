@@ -169,6 +169,9 @@ OutgroupChoice::computeOutgroups(){
                 std::vector<double> votes {0.0, 0.0};
 //                for(size_t k = 0; k < m_ptrParam->getOutgroupLimit(); ++k){
                 for(size_t k = 0; k < 20; ++k){
+
+                  // sampling of a, b, c, d
+                  if(m_benchmark) m_benchmark->startOutgroupsCorrectSample();
                   auto a_b = std::vector<Gene*>();
                   std::sample(genesC1.begin(), genesC1.end(),
                               std::back_inserter(a_b),
@@ -177,6 +180,8 @@ OutgroupChoice::computeOutgroups(){
                   std::sample(genesC2.begin(), genesC2.end(),
                               std::back_inserter(c_d),
                               2, std::mt19937{std::random_device{}()});
+                  if(m_benchmark) m_benchmark->endOutgroupsCorrectSample();
+
                   if(m_ptrParam->weightedMode()){
                     auto voteAndWeight = m_ptrQ->supportedQuartetWeighted(a_b[0], a_b[1], c_d[0], c_d[1]);
                     if(voteAndWeight.first == 0){
@@ -227,10 +232,26 @@ OutgroupChoice::initialize(){
   buildIMatrix();
   if(m_benchmark) m_benchmark->endSortDistances();
 
-  if(m_benchmark) m_benchmark->startOutgroupInit();
+  if(m_benchmark) {
+    m_benchmark->startOutgroupInit();
+    m_benchmark->startOutgroupsLca();
+  }
+
+  // compute the last common ancestors in S
   computeLcaS();
+
+  if(m_benchmark) {
+    m_benchmark->endOutgroupsLca();
+    m_benchmark->startOutgroupsCorrect();
+  }
+
+  // assign corrected outgroups
   computeOutgroups();
-  if(m_benchmark) m_benchmark->endOutgroupInit();
+
+  if(m_benchmark) {
+    m_benchmark->endOutgroupsCorrect();
+    m_benchmark->endOutgroupInit();
+  }
 }
 
 std::vector<Gene*>

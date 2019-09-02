@@ -22,7 +22,7 @@ Parameters::parseParameters(int argc, char* argv[]) {
   for(size_t i = 3; i < (size_t)argc; ++i) {
 
     std::string arg(argv[i]);
-    std::regex rgx1("-([A-Za-z0-9-]*)=([0-9]*\\.?[0-9]*)");
+    std::regex rgx1("-([A-Za-z0-9-]*)=([A-Za-z0-9-_\\.]*)");
     std::regex rgx2("-([A-Za-z0-9-]*)");
     std::smatch matches;
     std::string parameterString = "";
