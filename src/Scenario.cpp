@@ -67,7 +67,7 @@ Scenario::parseDistanceMatrix(std::string filepath){
 
     ++lineCounter;
   }
-  if(m_benchmark) m_benchmark->setGeneNumber(m_genes.size());
+
   rebuildMap();
 
   // // test output of the matrix

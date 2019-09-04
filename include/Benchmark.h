@@ -6,11 +6,12 @@
 
 #include "Parameters.h"
 
+class Scenario;
+
 class Benchmark {
 public:
   Benchmark(Parameters* ptrParam)
    : m_ptrParam(ptrParam)
-   , m_geneNumber(0)
    , m_initTime(std::chrono::high_resolution_clock::now())
    , m_readFilesStart()
    , m_sortDistancesStart()
@@ -54,8 +55,6 @@ public:
      m_totalDuration = m_readFilesStart - m_readFilesStart;
     };
 
-  void setGeneNumber(size_t geneNumber) { m_geneNumber = geneNumber; };
-
   void startReadFiles() { m_readFilesStart = std::chrono::high_resolution_clock::now(); };
   void endReadFiles() { m_readFilesDuration = std::chrono::high_resolution_clock::now() - m_readFilesStart; };
 
@@ -87,11 +86,10 @@ public:
 
   void endTotal() { m_totalDuration += std::chrono::high_resolution_clock::now() - m_initTime; };
 
-  void flush(std::basic_ofstream<char>& stream);
+  void flush(std::basic_ofstream<char>& stream, Scenario& ptrS);
 
 private:
   Parameters* m_ptrParam;
-  size_t m_geneNumber;
 
   std::chrono::time_point<std::chrono::high_resolution_clock> m_initTime;
 

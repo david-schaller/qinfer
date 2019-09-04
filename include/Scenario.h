@@ -33,11 +33,17 @@ public:
   std::deque<Gene>&
   getGenes() { return m_genes; };
 
+  size_t
+  getGeneNumber() const { return m_genes.size(); };
+
   Gene*
   getGenePtr(size_t idx) { return &(m_genes[idx]); }
 
   const std::vector<Gene*>&
   getSpeciesGenes(std::string species) const { return m_speciesGenes.at(species); };
+
+  size_t
+  getSpeciesNumber() const { return m_speciesGenes.size(); };
 
   const double&
   getDistance(size_t row, size_t column) const { return m_distanceMatrix.at(row, column); };

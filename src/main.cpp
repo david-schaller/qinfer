@@ -30,7 +30,7 @@ main(int argc, char* argv[]) -> int
   if(benchmark){
     bm.endTotal();
     std::ofstream ostrm(param.getBenchmarkFilename(), std::ios::app);
-    bm.flush(ostrm);
+    bm.flush(ostrm, s);
   }
 
   return 0;
