@@ -1,6 +1,7 @@
 #include <fstream>
 #include <iostream>
 #include <set>
+#include <regex>
 
 #include "Scenario.h"
 #include "Tree.h"
@@ -23,6 +24,15 @@ Scenario::getOutgroups(Gene* genePtr) const {
 const std::vector<std::string>&
 Scenario::getSpeciesSubtree(size_t subtreeIdx) const {
   return m_STreeSubtrees[subtreeIdx];
+}
+
+std::vector<std::string>
+Scenario::split(std::string s){
+  std::regex ws_re("\\s+");   // split at whitespace(s)
+  std::vector<std::string> result{
+      std::sregex_token_iterator(s.begin(), s.end(), ws_re, -1), {}
+  };
+  return result;
 }
 
 void
@@ -82,26 +92,17 @@ Scenario::parseDistanceMatrix(std::string filepath){
 void
 Scenario::parseDistanceMatrixRow(std::string row, size_t rowIdx){
 
-  const std::string delimiter = "\t";
-
+  std::vector<std::string> items = split(row);
   size_t columnIdx = 0;
-  size_t pos = 0;
-  std::string token;
-  while ((pos = row.find(delimiter)) != std::string::npos) {
-    token = row.substr(0, pos);
-    row.erase(0, pos + delimiter.length());
 
-    // the first row element contains the identifier
-    if(columnIdx == 0) {
-      m_genes.push_back(Gene(token, m_genes.size()));
+  for(auto& item : items){
+    if(columnIdx == 0){
+      m_genes.push_back(Gene(item, m_genes.size()));
     } else {
-      m_distanceMatrix.at(rowIdx, columnIdx - 1) = std::stod(token);
+      m_distanceMatrix.at(rowIdx, columnIdx - 1) = std::stod(item);
     }
-
     ++columnIdx;
   }
-  // parse the last element
-  m_distanceMatrix.at(rowIdx, columnIdx - 1) = std::stod(row);
 }
 
 void
@@ -125,39 +126,24 @@ Scenario::parseSpeciesGenesLine(std::string line){
   auto g = std::vector<Gene*>();
   std::string species;
 
-  const std::string delimiter = "\t";
-
+  std::vector<std::string> items = split(line);
   bool firstElement = true;
-  size_t pos = 0;
-  std::string token;
 
-  while ((pos = line.find(delimiter)) != std::string::npos) {
-    token = line.substr(0, pos);
-    line.erase(0, pos + delimiter.length());
-
+  for(auto& item : items){
     // the first element is the species identifier
     if(firstElement) {
-      species = token;
+      species = item;
       firstElement = false;
     } else {
       try {
-        g.push_back(m_geneAssignments.at(token));
-        m_geneAssignments.at(token)->setSpecies(species);
+        g.push_back(m_geneAssignments.at(item));
+        m_geneAssignments.at(item)->setSpecies(species);
       } catch(const std::out_of_range&) {
         std::cerr << "WARNING: Species-to-genes-file contains additional entries: "
-                  << token
+                  << item
                   << std::endl;
       }
     }
-  }
-  // push back last line element
-  try {
-    g.push_back(m_geneAssignments.at(line));
-    m_geneAssignments.at(line)->setSpecies(species);
-  } catch(const std::out_of_range&) {
-    std::cerr << "WARNING: Species-to-genes-file contains additional entries: "
-              << line
-              << std::endl;
   }
 
   m_speciesGenes.insert(std::pair<std::string, std::vector<Gene*>>(species, g));
@@ -220,31 +206,17 @@ void
 Scenario::parseSTreeSubtreeLine(std::string line){
   m_STreeSubtrees.push_back(std::vector<std::string>());
 
-  const std::string delimiter = "\t";
-  size_t pos = 0;
-  std::string token;
+  std::vector<std::string> items = split(line);
 
-  while ((pos = line.find(delimiter)) != std::string::npos) {
-    token = line.substr(0, pos);
-    line.erase(0, pos + delimiter.length());
-
-    if(m_speciesGenes.find(token) == m_speciesGenes.end()){
+  for(auto& item : items){
+    if(m_speciesGenes.find(item) == m_speciesGenes.end()){
       std::cerr << "WARNING: Species-subtrees-file contains species without genes: "
-                << token
+                << item
                 << " (omitted)"
                 << std::endl;
     } else {
-      m_STreeSubtrees.back().push_back(token);
+      m_STreeSubtrees.back().push_back(item);
     }
-  }
-  // push back last line element
-  if(m_speciesGenes.find(line) == m_speciesGenes.end()){
-    std::cerr << "WARNING: Species-subtrees-file contains species without genes: "
-              << line
-              << " (omitted)"
-              << std::endl;
-  } else {
-    m_STreeSubtrees.back().push_back(line);
   }
 }
 

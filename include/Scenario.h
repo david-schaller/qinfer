@@ -71,6 +71,8 @@ private:
   std::vector<std::vector<std::string>> m_STreeSubtrees;
   std::vector<std::vector<Gene*>> m_outgroups;
 
+  std::vector<std::string> split(std::string s);
+
   void parseDistanceMatrix(std::string filepath);
   void parseSpeciesGenes(std::string filepath);
   void parseSTreeSubtrees(std::string filepath, bool subtreeFiles);
