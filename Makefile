@@ -1,4 +1,4 @@
-.PHONY: all tests clean release remake
+.PHONY: all tests clean debug remake
 
 GTEST_DIR := $(HOME)/development_cpp/gtest/googletest
 
@@ -22,18 +22,18 @@ UT_SRCS = $(shell find $(UT)/$(SRC) -name '*.cpp')
 OBJS = $(subst $(SRC)/,$(OBJ)/,$(subst .cpp,.o,$(SRCS)))
 UT_OBJS = $(subst $(SRC)/,$(OBJ)/,$(subst .cpp,.o,$(UT_SRCS)))
 
-ifeq ($(RELEASE),true)
-	CPPFLAGS = -O3 -DNDEBUG -Wall -Wextra -pthread -std=c++17
-	LDFLAGS = -s -lstdc++fs
-else
+ifeq ($(DEBUG),true)
 	CPPFLAGS = -g -O0 -Wall -Wextra -pthread -std=c++17
 	LDFLAGS = -lstdc++fs
+else
+	CPPFLAGS = -O3 -DNDEBUG -Wall -Wextra -pthread -std=c++17
+	LDFLAGS = -s -lstdc++fs
 endif
 
 all: $(BIN)/$(TARGET)
 
-release:
-	make RELEASE=true
+debug:
+	make DEBUG=true
 
 tests: $(BIN)/unittest
 	./$(BIN)/unittest
